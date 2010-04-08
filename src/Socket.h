@@ -30,7 +30,6 @@ private:
 	};
 
 public:
-  
 	Socket()
   {
     sockfd = socket(PF_INET, SOCK_STREAM, 0);

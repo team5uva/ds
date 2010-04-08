@@ -9,6 +9,7 @@
 #include "Client.h"
 #include "Socket.h"
 #include <string>
+#include <assert.h>
 #include <pthread.h>
 #include <vector>
 
@@ -40,7 +41,7 @@ private:
 	enum MESSAGETYPE {
 			REGISTERCLIENT = 100,
 			CLIENTADDED = 110,
-			CLIENTDELETED = 120 // en nog meer ...
+			CLIENTDELETED = 120 // and moar ...
 		};
 
 
