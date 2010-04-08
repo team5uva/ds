@@ -7,6 +7,7 @@
 #include "Admin.h"
 #include "Logger.h"
 #include "Client.h"
+#include "Socket.h"
 #include <string>
 #include <pthread.h>
 #include <vector>
