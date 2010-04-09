@@ -7,6 +7,7 @@
 #include <iostream>
 #include <string>
 #include <cstring>
+#include <stdlib.h>
 #include "Server4.h"
 #include "ClientThread.h"
 #include <sys/types.h>
