@@ -39,9 +39,10 @@ void ClientThread::run()
 }
 
 /* Start the thread. */
-void ClientThread::start(Socket* clientSocket)
+void ClientThread::start(Socket* clientSocket, vector<ClientThread*>* cThreads)
 {
   this->clientSocket = clientSocket;
+  this->cThreads = cThreads;
   Thread::start();
 }
 

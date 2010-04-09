@@ -32,7 +32,8 @@ int main(int argc, char* argv[])
   {
     clientSocket = listenSocket->acceptConn(); 
     cThread = new ClientThread();
-    cThread->start(clientSocket);
+    cThreads.push_back(cThread);
+    cThread->start(clientSocket, &cThreads);
   }
 
   //receive(clientSocket);
