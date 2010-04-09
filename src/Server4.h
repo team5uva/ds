@@ -38,12 +38,6 @@ private:
 			REGULAR = 1
 		};
 
-	enum MESSAGETYPE {
-			REGISTERCLIENT = 100,
-			CLIENTADDED = 110,
-			CLIENTDELETED = 120 // and moar ...
-		};
-
 
 public:
 	Server4();

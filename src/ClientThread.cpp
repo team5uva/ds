@@ -45,4 +45,3 @@ void ClientThread::start(Socket* clientSocket, vector<ClientThread*>* cThreads)
   this->cThreads = cThreads;
   Thread::start();
 }
-

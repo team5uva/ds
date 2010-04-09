@@ -13,13 +13,37 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <sstream>
 
 using namespace std;
+/*
+int readFirst(Socket* socket)
+{
+  string message;
+	unsigned char inBuffer[200];
+	int msgLength, msgCode, inBufLength = 0;
+	stringstream out;
+
+	inBufLength = socket->readBytes(inBuffer, inBufLength, 2);
+	msgLength = ((inBuffer[0]) << 8) + (inBuffer[1]);
+
+	if(msgLength == 0)
+	  std::cout << "Error: invalid registration." << std::endl;
+
+	inBufLength = clientSocket->readBytes(inBuffer, inBufLength, 2);
+	msgCode = ((inBuffer[0]) << 8) + (inBuffer[1]);
+
+  inBufLength = clientSocket->readBytes(inBuffer, inBufLength, msgLength - 4);
+  out << msgCode;
+  message = string(out.str() << (char*)inBuffer, msgLength - 4);
+
+  return message;
+}*/
 
 int main(int argc, char* argv[])
 {
-  vector<ClientThread*> cThreads;
-  ClientThread* cThread;
+  vector<Thread*> threads;
+  Thread* thread;
   Socket *clientSocket, *listenSocket = new Socket;
   int port;
 
@@ -31,9 +55,11 @@ int main(int argc, char* argv[])
   while(true)
   {
     clientSocket = listenSocket->acceptConn(); 
-    cThread = new ClientThread();
-    cThreads.push_back(cThread);
-    cThread->start(clientSocket, &cThreads);
+    thread = new Thread();
+    threads.push_back(thread);
+    thread->start(clientSocket, &threads);
+
+ 
   }
 
   //receive(clientSocket);
