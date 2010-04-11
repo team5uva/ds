@@ -109,13 +109,23 @@ int Socket::connectTo(string host, int port)
       return -1;
   }
 
+  /* Reads bytes and removes them from queue if there are bytes to read, else
+   * blocks thread. prevReadLen is the amount of chars currently in inBuffer.
+   */
   int Socket::readBytes(unsigned char* inBuffer, int prevReadLen, int bytes)
   {
     bzero(inBuffer, prevReadLen);
     return read(sockfd, inBuffer, bytes);
   }
 
-
+  /* Reads bytes and leaves them in queue, does not block thread.
+   * prevReadLen is the amount of chars currently in inBuffer.
+   */
+  int Socket::peekBytes(unsigned char* inBuffer, int prevReadLen, int bytes)
+  {
+    bzero(inBuffer, prevReadLen);
+    return recv(sockfd, inBuffer, bytes, MSG_PEEK);
+  }
 
   /* Gets socket file descriptor */
   int Socket::getSockfd()
