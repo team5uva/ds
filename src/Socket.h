@@ -36,6 +36,7 @@ public:
  
   int listenForConn();
   int readBytes(unsigned char* inBuffer, int prevReadLen, int bytes);
+  int peekBytes(unsigned char* inBuffer, int prevReadLen, int bytes);
   
 
   /* Gets socket file descriptor */
