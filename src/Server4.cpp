@@ -9,6 +9,7 @@
 #include <cstring>
 #include <stdlib.h>
 #include "Server4.h"
+#include "configFile.h"
 #include "ClientThread.h"
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -21,8 +22,21 @@ int main(int argc, char* argv[])
   vector<ClientThread*> cThreads;
   ClientThread* cThread;
   Socket *clientSocket, *listenSocket = new Socket;
+  configFile config;
   int port;
 
+  /* Read configuration file */
+  if(config.parseFile() == configFile::SUCCESS) {
+      /* No problems detected in configuration file */
+      /* Maybe some detection here to check if all variables have indeed been set*/
+      cout << "No problems detected in configuration file." << endl;
+  } else {
+      /* Error in configuration file, shut down program */
+      /* Maybe make a breakdown of different sort of errors to handle it more
+         gracefully */
+      cout << "Problem detected in configuration file, shutting down..." << endl;
+      return 0;
+  }
   port = atoi(argv[1]);
 
   listenSocket->bindTo(port);

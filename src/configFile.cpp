@@ -24,7 +24,7 @@ size_t found;
  * Not possible yet to set own path. */
 configFile::ERROR_CODE configFile::parseFile() {
     string line;
-    ifstream cfgFile("config.cfg");
+    ifstream cfgFile(path.c_str());
     if (cfgFile.is_open()) {
         while (!cfgFile.eof()) {
             getline(cfgFile, line);
