@@ -9,11 +9,12 @@
 #include <cstring>
 #include <stdlib.h>
 #include "Server4.h"
+#include "configFile.h"
 #include "ClientThread.h"
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
-#include <sstream>
+#include "Admin.h"
 
 using namespace std;
 /*
@@ -45,8 +46,25 @@ int main(int argc, char* argv[])
   vector<Thread*> threads;
   Thread* thread;
   Socket *clientSocket, *listenSocket = new Socket;
+  configFile config;
   int port;
 
+  /* Read configuration file */
+  if(config.parseFile() == configFile::SUCCESS) {
+      /* No problems detected in configuration file */
+      /* Maybe some detection here to check if all variables have indeed been set*/
+      cout << "No problems detected in configuration file." << endl;
+      for(int i = 0; i < config.adminAccess.size(); i++) {
+          cout << config.adminAccess.at(i)->name << endl;
+          cout << config.adminAccess.at(i)->password << endl;
+      }
+  } else {
+      /* Error in configuration file, shut down program */
+      /* Maybe make a breakdown of different sort of errors to handle it more
+         gracefully */
+      cout << "Problem detected in configuration file, shutting down..." << endl;
+      return 0;
+  }
   port = atoi(argv[1]);
 
   listenSocket->bindTo(port);
