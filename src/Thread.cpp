@@ -1,4 +1,5 @@
 #include "Thread.h"
+#include "Message.h"
 #include <iostream>
 
 using namespace std;
@@ -25,6 +26,8 @@ void Thread::runClient()
     string message;
     unsigned char inBuffer[200];
     int msgLength, msgCode, inBufLength = 0;
+
+    Message* firstMessage = Message::messageFromSocket(socket);
 
     while(true)
     {
