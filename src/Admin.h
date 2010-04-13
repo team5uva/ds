@@ -9,12 +9,12 @@ using namespace std;
 class Admin {
 private:
 
-	string name;
-	string password;
-
 public:
-	Admin();
-	~Admin();
+
+    string name;
+    string password;
+    Admin(){}
+    ~Admin();
 };
 
 #endif /* ADMIN_H_ */

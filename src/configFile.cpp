@@ -16,8 +16,6 @@ string arg_CSPort = ("CSPort ");
 string arg_listenPort = ("listenPort ");
 string arg_Tag = ("Tag ");
 
-vector<string> adminAccess;
-
 size_t found;
 
 /* Parse supplied configuration file.
@@ -33,9 +31,10 @@ configFile::ERROR_CODE configFile::parseFile() {
             } else if (line.at(0) == arg_Admin.at(0)) {
                 /* Administrator username and password */
                 if (found = line.find("|")) {
-                    adminAccess.push_back(line.substr(1, found - 1));
-                    adminAccess.push_back(line.substr(
-                            found + 1, line.length() - 1));
+                    Admin *admin = new Admin();
+                    admin->name = line.substr(1, found - 1);
+                    admin->password = line.substr(found + 1, line.length() - 1);
+                    adminAccess.push_back(admin);
                 } else {
                     return CORRUPT_CONFIG_FILE;
                 }
@@ -89,6 +88,6 @@ string configFile::getTag() {
     return Tag;
 }
 
-vector<string> configFile::getAdmin() {
+vector<Admin*> configFile::getAdmin() {
     return adminAccess;
 }

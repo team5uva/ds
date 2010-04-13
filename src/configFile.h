@@ -2,6 +2,7 @@
 #define PARSECONFIG_H_
 
 #include <string>
+#include "Admin.h"
 
 using namespace std;
 
@@ -16,6 +17,7 @@ public:
     string path;
     int listenPort, CSPort;
     string CSAddress, Tag;
+    vector<Admin*> adminAccess;
 
     configFile() {
         path = "config.cfg";
@@ -31,6 +33,6 @@ public:
     int getCSPort();
     string getCSAddress();
     string getTag();
-    vector<string> getAdmin();
+    vector<Admin*> getAdmin();
 };
 #endif /* PARSECONFIG_H_ */
