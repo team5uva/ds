@@ -15,15 +15,32 @@ Message* Message::messageFromSocket(Socket* s)
   return new Message(message, length);
 }
 
+void Message::MessageToSocket(Socket* s, Message* m)
+{
+  std::cout << "trying to send message of length " << m->length << " and code " << m->type << std::endl;
+  s->writeBytes(m->rawData, m->length);
+}
+
 Message::Message(unsigned char* data, int length)
 {
   this->rawData = data;
   this->length = length;
 }
 
+Message::Message()
+{
+  this->rawData = new unsigned char[200];
+  this->length = 0;
+}
+
 int Message::getType()
 {
   return type;
+}
+
+void Message::addParameter(string s)
+{
+  words.push_back(s);
 }
 
 void Message::parseData()
@@ -44,4 +61,34 @@ void Message::parseData()
     else
       words.back().push_back(rawData[i]);
   }
+}
+
+void Message::buildRawData()
+{
+  short rawType = htons(type);
+  rawData[2] = ((unsigned char*)&rawType)[0];
+  rawData[3] = ((unsigned char*)&rawType)[1];
+
+
+  string message;
+
+  for (int i = 0; i < words.size(); i++)
+  {
+    message.append(words[i]);
+    if (i + 1 < words.size())
+      message.append(" ");
+  }
+
+  for (int i = 0; i < message.size(); i++)
+  {
+    rawData[i+4] = message[i];
+  }
+
+  length = 4 + message.size();
+  short rawSize = htons(length);
+  rawData[0] = rawSize;
+
+
+  rawData[0] = ((unsigned char*)&rawSize)[0];
+  rawData[1] = ((unsigned char*)&rawSize)[1];
 }

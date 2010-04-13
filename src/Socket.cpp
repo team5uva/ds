@@ -127,6 +127,11 @@ int Socket::connectTo(string host, int port)
     return recv(sockfd, inBuffer, bytes, MSG_PEEK);
   }
 
+  int Socket::writeBytes(unsigned char* buffer, int bytes)
+  {
+    return write(sockfd, buffer, bytes);
+  }
+
   /* Gets socket file descriptor */
   int Socket::getSockfd()
   {

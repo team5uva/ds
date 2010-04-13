@@ -1,5 +1,6 @@
 #include "Thread.h"
 #include "Message.h"
+#include "MessageType.h"
 #include <iostream>
 
 using namespace std;
@@ -28,6 +29,15 @@ void Thread::runClient()
     int msgLength, msgCode, inBufLength = 0;
 
     Message* firstMessage = Message::messageFromSocket(socket);
+    firstMessage->parseData();
+    if(firstMessage->getType() == CLIENT_REGISTER)
+    {
+      cout << "started Client Thread" << endl;
+      Message response;
+      response.type = REGISTRATION_SUCCESS;
+      response.buildRawData();
+      Message::MessageToSocket(socket,&response);
+    }
 
     while(true)
     {
