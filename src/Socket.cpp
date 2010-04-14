@@ -158,11 +158,11 @@ int Socket::connectTo(string host, int port)
 int Socket::send(MESSAGE message) {
     int status = writeBytes((unsigned char*) &message, ntohs(message.len));
        if (status == -1) {
-		return false;
-		   } else {
-			    cout << "message " << ntohs(message.type) << " < " << ntohs(message.len) << " is sent. \n";
-				   return true;
-				      }
+	return false;
+   } else {
+    cout << "message " << ntohs(message.type) << " < " << ntohs(message.len) << " is sent. \n";
+   return true;
+     }
 }
 
 int Socket::receive(MESSAGE &message) {

@@ -11,11 +11,11 @@
 #include <pthread.h>
 #include "Server4.h"
 #include "configFile.h"
-#include "ClientThread.h"
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include "Admin.h"
+#include "Thread.h"
 #include "Message.h"
 
 using namespace std;
