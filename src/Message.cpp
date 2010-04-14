@@ -2,6 +2,7 @@
 #include <assert.h>
 #include <iostream>
 #include "Message.h"
+#include "Socket.h"
 #include "MessageType.h"
 
 Message* Message::messageFromSocket(Socket* s)

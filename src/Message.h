@@ -2,8 +2,19 @@
 #define MESSAGE_H_
 #include <string>
 #include <vector>
-#include "Socket.h"
+class Socket;
+class Message;
+
 using namespace std;
+
+
+typedef struct MESSAGE
+{
+  short len;
+  short type;
+  unsigned char msg[196];
+}MESSAGE, *PMESSAGE;
+
 
 class Message {
 private:

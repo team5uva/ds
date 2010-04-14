@@ -2,6 +2,7 @@
 #ifndef SOCKET_H_
 #define SOCKET_H_
 #include <string>
+#include "Message.h"
 
 using namespace std;
 
@@ -33,7 +34,9 @@ public:
   int connectTo(string host, int port);
   /* Blocks thread till external connection attempt is made */
   Socket* acceptConn();
- 
+
+  int send(MESSAGE message); 
+  int receive(MESSAGE& message);
   int listenForConn();
   int readBytes(unsigned char* inBuffer, int prevReadLen, int bytes);
   int peekBytes(unsigned char* inBuffer, int prevReadLen, int bytes);

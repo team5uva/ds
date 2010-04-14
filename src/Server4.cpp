@@ -8,6 +8,7 @@
 #include <string>
 #include <cstring>
 #include <stdlib.h>
+#include <pthread.h>
 #include "Server4.h"
 #include "configFile.h"
 #include "ClientThread.h"
@@ -62,7 +63,7 @@ void* controlThread(void *_obj) {
 	MESSAGE response;
 	while (true) {
 
-		if (controlServer_socket.recv(response) > 0) {
+		if (controlServer_socket.receive(response) > 0) {
 
 			cout << "Mss: " << ntohs(response.len) << " " << ntohs(response.type) << " " << response.msg << "\n\n";
 
@@ -92,6 +93,9 @@ int main(int argc, char* argv[])
   Socket *clientSocket, *listenSocket = new Socket;
   configFile config;
   int port;
+
+  pthread_t control_thread;
+  int error = pthread_create(&control_thread, 0, controlThread, 0);
 
   /* Read configuration file */
   if(config.parseFile() == configFile::SUCCESS) {
