@@ -10,6 +10,7 @@
 #include <stdlib.h>
 #include <pthread.h>
 #include "Server4.h"
+#include "Server.h"
 #include "configFile.h"
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -32,22 +33,39 @@ void* controlThread(void *_obj) {
 
 	Socket controlServer_socket;
 	controlServer_socket.connectTo("146.50.1.95", 2001);
-        Message::MessageToSocket(&controlServer_socket, &m);
+	Message::MessageToSocket(&controlServer_socket, &m);
 
 	Message* response;
 	while (true) {
-	  response = Message::messageFromSocket(&controlServer_socket);
-	  response->parseData();
+		response = Message::messageFromSocket(&controlServer_socket);
+		response->parseData();
 
-	  cout << "Message type: " << response->type << "\n\n";
+		cout << "Message type: " << response->type << "\n\n";
 
-	  if (response->type == PING) {
-	    Message msg;
-	    msg.type = PONG;
-	    msg.buildRawData();
+		// Get adres of the parent server if exists
+		if (response->type == ADDRESS_FROM_CONTROL) {
 
-	    Message::MessageToSocket(&controlServer_socket, &msg);
-	  }
+			if(response->words[0] != "none"){
+				cout << "Got parent server address: " << response->words[0] << "\n\n";
+
+				//Create parent server
+				Server* parent;
+				parent->socketaddress = response->words[0];
+
+				//server4->servers.push_back(parent);
+
+			}else{
+				cout << "No parent server exists.""\n\n";
+			}
+
+	    // PING - PONG control server
+		} else if (response->type == PING) {
+			Message msg;
+			msg.type = PONG;
+			msg.buildRawData();
+
+			Message::MessageToSocket(&controlServer_socket, &msg);
+		}
 	}
 	return NULL;
 }
@@ -101,6 +119,7 @@ int main(int argc, char* argv[])
   //receive(clientSocket);
 
   shutdown(clientSocket->getSockfd(), 1);
+
 	close(clientSocket->getSockfd());
 	std::cout << "Teh end." << std::endl;
 }
