@@ -167,14 +167,14 @@ int Socket::send(MESSAGE message) {
 
 int Socket::receive(MESSAGE &message) {
 
-      int status = readBytes((unsigned char*) &message, 0, 200);
+  int status = readBytes((unsigned char*) &message, 0, 200);
 
-          if (status == -1) {
-	            std::cout << "status == -1   error  " << "  in Socket::recv\n";
-		            return 0;
-			        } else if (status == 0) {
-				          return 0;
-					      } else {
-						        return status;
-							    }
+  if (status == -1) {
+    std::cout << "status == -1   error  " << "  in Socket::recv\n";
+    return 0;
+  } else if (status == 0) {
+    return 0;
+  } else {
+    return status;
+  }
 }
