@@ -23,7 +23,7 @@ private:
   static void *start_thread(void *obj);
   void determineType();
   void runServer();
-  void runClient();
+  void runClient(Client* c);
 
 public:
   int getType();

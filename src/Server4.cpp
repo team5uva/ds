@@ -25,6 +25,11 @@ using namespace std;
 
 Server4 server4;
 
+
+void Server4::addClient(Client* client)
+{
+  this->clients.push_back(client);
+}
 void Server4::addServer(string address, bool parent){
 
 	Server* server;

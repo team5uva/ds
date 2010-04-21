@@ -40,6 +40,7 @@ private:
 public:
 
 	void addServer(string address, bool parent);
+	void addClient(Client* client);
 
 	Server4(){}
 	~Server4(){}

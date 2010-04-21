@@ -20,7 +20,7 @@ void* Thread::start_thread(void *obj)
   reinterpret_cast<Thread*>(obj)->determineType();
 }
 
-void Thread::runClient()
+void Thread::runClient(Client* c)
 {
   while (!m_stoprequested)
   {
@@ -29,6 +29,9 @@ void Thread::runClient()
     int msgLength, msgCode, inBufLength = 0;
 
     cout << "started Client Thread" << endl;
+
+    Client* c = new Client();
+
     Message response;
     response.type = REGISTRATION_SUCCESS;
     response.buildRawData();
@@ -91,17 +94,18 @@ void Thread::determineType()
     firstMessage->parseData();
     if(firstMessage->getType() == CLIENT_REGISTER)
     {
-      runClient();
+      Client* c = new Client();
+      c->name = firstMessage->words[0];
+      if (firstMessage->words.size() > 1)
+	c->password = firstMessage->words[1];
+      this->server4->addClient(c);
+      runClient(c);
     } else if (firstMessage->getType() == SERVER_REGISTER)
     {
       runServer();
     } else {
       std::cout << "invalid connection attempt" << std::endl;
     }
-
-
-
-   runClient();
 }
 
 int Thread::getType()
