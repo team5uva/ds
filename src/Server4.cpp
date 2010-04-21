@@ -24,12 +24,12 @@
 using namespace std;
 
 Server4 server4;
+string message = "145.18.29.144:2001:team4-Yo";
+
 
 void Server4::addServer(string address, bool parent){
 
-	Server* server;
-	server->socketaddress = address;
-
+	Server* server = new Server(address, message, true);
 	server4.servers.push_back(server);
 
 	if(parent){
@@ -38,7 +38,6 @@ void Server4::addServer(string address, bool parent){
 }
 
 void* controlThread(void *_obj) {
-	string message = "87.210.237.85:2001:45j45t5h5t948dj5fh049ffe454Yo";
 
 	Message m;
 	m.type = ADDRESS_TO_CONTROL;
@@ -54,7 +53,7 @@ void* controlThread(void *_obj) {
 		response = Message::messageFromSocket(&controlServer_socket);
 		response->parseData();
 
-		cout << "Message type: " << response->type << "\n\n";
+		cout << "From Control Server Message type: " << response->type << "\n";
 
 		// Get adres of the parent server if exists
 		if (response->type == ADDRESS_FROM_CONTROL) {
@@ -110,7 +109,7 @@ int main(int argc, char* argv[])
       cout << "Problem detected in configuration file, shutting down..." << endl;
       return 0;
   }
-  port = atoi(argv[1]);
+  port = config.getListenPort();
 
   listenSocket->bindTo(port);
   listenSocket->listenForConn();
