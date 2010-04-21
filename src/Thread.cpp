@@ -28,16 +28,12 @@ void Thread::runClient()
     unsigned char inBuffer[200];
     int msgLength, msgCode, inBufLength = 0;
 
-    Message* firstMessage = Message::messageFromSocket(socket);
-    firstMessage->parseData();
-    if(firstMessage->getType() == CLIENT_REGISTER)
-    {
-      cout << "started Client Thread" << endl;
-      Message response;
-      response.type = REGISTRATION_SUCCESS;
-      response.buildRawData();
-      Message::MessageToSocket(socket,&response);
-    }
+    cout << "started Client Thread" << endl;
+    Message response;
+    response.type = REGISTRATION_SUCCESS;
+    response.buildRawData();
+    Message::MessageToSocket(socket,&response);
+
 
     while(true)
     {
@@ -90,6 +86,20 @@ void Thread::stop()
 
 void Thread::determineType()
 {
+    Message* firstMessage = Message::messageFromSocket(socket);
+    firstMessage->parseData();
+    if(firstMessage->getType() == CLIENT_REGISTER)
+    {
+      runClient();
+    } else if (firstMessage->getType() == SERVER_REGISTER)
+    {
+      runServer();
+    } else {
+      std::cout << "invalid connection attempt" << std::endl;
+    }
+
+
+
    runClient();
 }
 
