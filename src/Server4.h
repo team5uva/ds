@@ -38,6 +38,9 @@ private:
 		};
 
 public:
+
+	void addServer(string address, bool parent);
+
 	Server4(){}
 	~Server4(){}
 };

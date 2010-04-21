@@ -23,6 +23,20 @@
 
 using namespace std;
 
+Server4 server4;
+
+void Server4::addServer(string address, bool parent){
+
+	Server* server;
+	server->socketaddress = address;
+
+	server4.servers.push_back(server);
+
+	if(parent){
+		server4.parent = server;
+	}
+}
+
 void* controlThread(void *_obj) {
 	string message = "87.210.237.85:2001:45j45t5h5t948dj5fh049ffe454Yo";
 
@@ -49,10 +63,7 @@ void* controlThread(void *_obj) {
 				cout << "Got parent server address: " << response->words[0] << "\n\n";
 
 				//Create parent server
-				Server* parent;
-				parent->socketaddress = response->words[0];
-
-				//server4->servers.push_back(parent);
+				server4.addServer(response->words[0], true);
 
 			}else{
 				cout << "No parent server exists.""\n\n";
