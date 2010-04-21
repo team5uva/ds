@@ -40,8 +40,8 @@ private:
 
 
 public:
-	Server4();
-	~Server4();
+	Server4(){}
+	~Server4(){}
 };
 
 #endif /* SERVER4_H_ */

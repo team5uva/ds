@@ -66,12 +66,13 @@ void Thread::runServer()
 }
 
 /* Start the thread. */
-void Thread::start(Socket* socket, vector<Thread*>* threads)
+void Thread::start(Socket* socket, vector<Thread*>* threads, Server4* server4)
 {
   assert(m_running == false);
   m_running = true;
   this->socket = socket;
   this->threads = threads;
+  this->server4 = server4;
   pthread_create(&m_thread, 0, &Thread::start_thread, this);
 }
 

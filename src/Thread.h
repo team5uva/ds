@@ -18,6 +18,7 @@ private:
   pthread_t m_thread;
   Socket* socket;
   vector<Thread*>* threads;
+  Server4* server4;
 
   static void *start_thread(void *obj);
   void determineType();
@@ -34,7 +35,7 @@ public:
 	~Thread();
 
   /* Start the thread. */
-  void start(Socket* socket, vector<Thread*>* threads);
+  void start(Socket* socket, vector<Thread*>* threads, Server4* server);
 
   /* Stop the thread. */
   void stop();

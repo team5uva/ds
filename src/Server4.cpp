@@ -86,12 +86,14 @@ int main(int argc, char* argv[])
   listenSocket->bindTo(port);
   listenSocket->listenForConn();
 
+  Server4 server4;
+
   while(true)
   {
     clientSocket = listenSocket->acceptConn(); 
     thread = new Thread();
     threads.push_back(thread);
-    thread->start(clientSocket, &threads);
+    thread->start(clientSocket, &threads, &server4);
 
  
   }
