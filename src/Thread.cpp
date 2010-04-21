@@ -2,6 +2,7 @@
 #include "Message.h"
 #include "MessageType.h"
 #include <iostream>
+#include <time.h>
 
 using namespace std;
 
@@ -28,6 +29,8 @@ void Thread::runClient(Client* c)
     unsigned char inBuffer[200];
     int msgLength, msgCode, inBufLength = 0;
 
+    time_t lastTime = time(0);
+
     cout << "started Client Thread" << endl;
 
     Client* c = new Client();
@@ -37,6 +40,16 @@ void Thread::runClient(Client* c)
     response.buildRawData();
     Message::MessageToSocket(socket,&response);
 
+    for (int i = 0; i < server4->clients.size(); i++)
+    {
+      if (server4->clients[i] == c)
+	continue;
+      Message clientNameMsg;
+      clientNameMsg.type = CLIENT_ADDED;
+      clientNameMsg.addParameter(server4->clients[i]->name);
+      clientNameMsg.buildRawData();
+      Message::MessageToSocket(socket, &clientNameMsg);
+    }
 
     while(true)
     {

@@ -16,7 +16,7 @@
 using namespace std;
 
 class Server4 {
-private:
+public:
 
 	// loaded from configuration file
 	int port;
@@ -37,7 +37,6 @@ private:
 			REGULAR = 1
 		};
 
-public:
 
 	void addServer(string address, bool parent);
 	void addClient(Client* client);
