@@ -140,27 +140,3 @@ int Socket::getSockstate() {
 int Socket::getPort() {
 	return port;
 }
-
-int Socket::send(MESSAGE message) {
-    int status = writeBytes((unsigned char*) &message, ntohs(message.len));
-       if (status == -1) {
-	return false;
-   } else {
-    cout << "message " << ntohs(message.type) << " < " << ntohs(message.len) << " is sent. \n";
-   return true;
-     }
-}
-
-int Socket::receive(MESSAGE &message) {
-
-  int status = readBytes((unsigned char*) &message, 0, 200);
-
-  if (status == -1) {
-    std::cout << "status == -1   error  " << "  in Socket::recv\n";
-    return 0;
-  } else if (status == 0) {
-    return 0;
-  } else {
-    return status;
-  }
-}

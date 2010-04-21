@@ -18,45 +18,36 @@
 #include "Thread.h"
 #include "Message.h"
 #include "Thread.h"
+#include "MessageType.h"
 
 using namespace std;
 
 void* controlThread(void *_obj) {
-
-	MESSAGE msg;
-
 	string message = "87.210.237.85:2001:45j45t5h5t948dj5fh049ffe454Yo";
 
-	for (unsigned int i = 0; i < message.size(); i++) {
-		msg.msg[i] = message.at(i);
-	}
-
-	msg.len = htons(message.length() + 4);
-	msg.type = htons(601);
+	Message m;
+	m.type = ADDRESS_TO_CONTROL;
+	m.addParameter(message);
+	m.buildRawData();
 
 	Socket controlServer_socket;
 	controlServer_socket.connectTo("146.50.1.95", 2001);
-	controlServer_socket.send(msg);
+        Message::MessageToSocket(&controlServer_socket, &m);
 
-	MESSAGE response;
+	Message* response;
 	while (true) {
+	  response = Message::messageFromSocket(&controlServer_socket);
+	  response->parseData();
 
-		if (controlServer_socket.receive(response) > 0) {
+	  cout << "Message type: " << response->type << "\n\n";
 
-			cout << "Mss: " << ntohs(response.len) << " " << ntohs(response.type) << " " << response.msg << "\n\n";
+	  if (response->type == PING) {
+	    Message msg;
+	    msg.type = PONG;
+	    msg.buildRawData();
 
-			if (ntohs(response.type) == 140) {
-
-				msg.type = htons(150);
-				msg.len = response.len;
-
-				for (unsigned int i = 0; i < ntohs(response.type) - 4; i++) {
-					msg.msg[i] = response.msg[i];
-				}
-
-				controlServer_socket.send(msg);
-			}
-		}
+	    Message::MessageToSocket(&controlServer_socket, &msg);
+	  }
 	}
 	return NULL;
 }

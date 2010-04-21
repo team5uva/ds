@@ -3,6 +3,7 @@
 #define SOCKET_H_
 #include <string>
 #include "Message.h"
+#include "SocketException.h"
 
 using namespace std;
 
@@ -35,8 +36,6 @@ public:
   /* Blocks thread till external connection attempt is made */
   Socket* acceptConn();
 
-  int send(MESSAGE message); 
-  int receive(MESSAGE& message);
   int listenForConn();
   int readBytes(unsigned char* inBuffer, int prevReadLen, int bytes);
   int peekBytes(unsigned char* inBuffer, int prevReadLen, int bytes);
