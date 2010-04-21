@@ -9,11 +9,11 @@ using namespace std;
 
 class Server {
 private:
-
-	string socketaddress;
-	vector<Server*> route;
+	Server* parent;
 
 public:
+	string socketaddress;
+
 	Server();
 	~Server();
 };

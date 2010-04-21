@@ -26,7 +26,6 @@ private:
 
 	bool connected;
 	Server* parent;
-	//char[] buffer;
 	Logger* logger;
 	pthread_t mainthread;
 
@@ -37,7 +36,6 @@ private:
 			ADMIN = 0,
 			REGULAR = 1
 		};
-
 
 public:
 	Server4();
