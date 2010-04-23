@@ -9,10 +9,8 @@ using namespace std;
 
 class Message {
 private:
-  int length;
-
 public:
-
+  int length;
   int type;
   vector<string> words;
   unsigned char* rawData;
