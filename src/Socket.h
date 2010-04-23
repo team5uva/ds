@@ -38,7 +38,8 @@ public:
 
   int listenForConn();
   int readBytes(unsigned char* inBuffer, int prevReadLen, int bytes);
-  int peekBytes(unsigned char* inBuffer, int prevReadLen, int bytes);
+  int peekBytes(unsigned char* inBuffer, int prevReadLen, int bytes, bool blocking);
+  //int peekBytesNB(unsigned char* inBuffer, int prevReadLen, int bytes);
   int writeBytes(unsigned char* buffer, int bytes);
  
 

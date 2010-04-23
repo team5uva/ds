@@ -6,7 +6,8 @@
 
 using namespace std;
 
-class Thread {
+class Thread
+{
 private:
   enum STATUS 
   {
@@ -19,11 +20,15 @@ private:
   Socket* socket;
   vector<Thread*>* threads;
   Server4* server4;
+  time_t lastPingTime;
 
   static void *start_thread(void *obj);
   void determineType();
   void runServer();
   void runClient(Client* c);
+  void processClientMessage(Client* c, Message* msg);
+  void processClientMulticast(Message* msg);
+  void ping();
 
 public:
   int getType();

@@ -25,25 +25,26 @@ void Thread::runClient(Client* c)
 {
   while (!m_stoprequested)
   {
-    string message;
-    unsigned char inBuffer[200];
-    int msgLength, msgCode, inBufLength = 0;
+    Message* receivedMessage, * latestMulticast;
+    Message response;
+    bool dontSleep;
 
-    time_t lastTime = time(0);
+    lastPingTime = time(0);
 
     cout << "started Client Thread" << endl;
 
-    Client* c = new Client();
+    latestMulticast = server4->getLatestMulticast();
 
-    Message response;
+    // Send registration success message to connecting client
     response.type = REGISTRATION_SUCCESS;
     response.buildRawData();
     Message::MessageToSocket(socket,&response);
 
+    // Send all other client names to connecting client
     for (int i = 0; i < server4->clients.size(); i++)
     {
       if (server4->clients[i] == c)
-	continue;
+	      continue;
       Message clientNameMsg;
       clientNameMsg.type = CLIENT_ADDED;
       clientNameMsg.addParameter(server4->clients[i]->name);
@@ -53,28 +54,99 @@ void Thread::runClient(Client* c)
 
     while(true)
     {
-      inBufLength = socket->readBytes(inBuffer, inBufLength, 2);
-      msgLength = ((inBuffer[0]) << 8) + (inBuffer[1]);
+      dontSleep = false;
+      
+      if(lastPingTime + 10 < time(0))
+        ping();
+      
+      receivedMessage = Message::messageFromSocket(socket, false);
 
-      if(msgLength == 0)
-        break;
-
-      inBufLength = socket->readBytes(inBuffer, inBufLength, 2);
-      msgCode = ((inBuffer[0]) << 8) + (inBuffer[1]);
-
-      if(msgLength - 4 > 0)
+      if(receivedMessage != NULL)
       {
-        inBufLength = socket->readBytes(inBuffer, inBufLength, msgLength - 4);
-        message = string((char*)inBuffer, msgLength - 4);
+        receivedMessage->parseData();
+        processClientMessage(c, receivedMessage);
+        dontSleep = true;
       }
-      else
-        message = string();
 
-      //std::cout << "Message length: " << msgLength << std::endl;
-      std::cout << "Message code: " << msgCode << std::endl;
-      std::cout << "Message: " << message << std::endl;
+      if(latestMulticast == NULL)
+        latestMulticast = server4->getLatestMulticast();
+      else if(latestMulticast->next != NULL)
+      {
+        latestMulticast = latestMulticast->next;
+        processClientMulticast(latestMulticast);
+        dontSleep = true;
+      }
+
+      if(!dontSleep)
+        usleep(50000);
     }
   }
+}
+
+void Thread::processClientMessage(Client* c, Message* msg)
+{
+  Message response;
+
+  if(msg->type == CLIENT_REMOVED_FROM_CLIENT)
+  {
+    msg->words.insert(msg->words.begin(), c->name);
+    server4->addMulticast(CLIENT_REMOVED_FROM_SERVER, &(msg->words));
+
+    for(int i = 0; i < server4->clients.size(); i++)
+      if(server4->clients[i] == c)
+        server4->clients.erase(server4->clients.begin() + i);
+    
+    stop();
+  }
+  else if(msg->type == PING)
+  {
+    response.type = PONG;
+    response.addParameter(msg->words.at(0));
+    response.buildRawData();
+    Message::MessageToSocket(socket, &response);
+  }
+  else if(msg->type == NAMECHANGE_FROM_CLIENT)
+  {
+    /* If name already exists, name change fails. */
+    for(int i = 0; i < server4->clients.size() && response.type == 0; i++)
+      if(server4->clients[i]->name.compare(msg->words[0]) == 0)
+        response.type = NAMECHANGE_FAIL;
+
+    if(response.type != NAMECHANGE_FAIL)
+    {
+      response.type = NAMECHANGE_SUCCESS;
+
+      msg->words.insert(msg->words.begin(), c->name);
+      server4->addMulticast(NAMECHANGE_FROM_SERVER, &(msg->words));
+    }
+
+    response.buildRawData();
+    Message::MessageToSocket(socket, &response);
+  }
+  else if(msg->type == TEXT_FROM_CLIENT)
+  {
+    msg->words.insert(msg->words.begin(), c->name);
+    server4->addMulticast(TEXT_FROM_SERVER, &(msg->words));
+  }
+  else if(msg->type == ACTION_FROM_CLIENT)
+  {
+    msg->words.insert(msg->words.begin(), c->name);
+    server4->addMulticast(ACTION_FROM_SERVER, &(msg->words));
+  }
+  else if(msg->type == PONG)
+  {
+    if(lastPingTime + 2 < time(0))
+      stop();
+  }
+  else if(msg->type == SERVER_STOP)
+    exit(0);
+}
+
+void Thread::processClientMulticast(Message* msg)
+{
+  if(msg->type == CLIENT_ADDED || msg->type == TEXT_FROM_SERVER ||
+      msg->type == ACTION_FROM_SERVER || NAMECHANGE_FROM_SERVER)
+    Message::MessageToSocket(socket, msg);
 }
 
 void Thread::runServer()
@@ -103,25 +175,41 @@ void Thread::stop()
 
 void Thread::determineType()
 {
-    Message* firstMessage = Message::messageFromSocket(socket);
-    firstMessage->parseData();
-    if(firstMessage->getType() == CLIENT_REGISTER)
-    {
-      Client* c = new Client();
-      c->name = firstMessage->words[0];
-      if (firstMessage->words.size() > 1)
-	c->password = firstMessage->words[1];
-      this->server4->addClient(c);
-      runClient(c);
-    } else if (firstMessage->getType() == SERVER_REGISTER)
-    {
-      runServer();
-    } else {
-      std::cout << "invalid connection attempt" << std::endl;
-    }
+  Message* firstMessage = Message::messageFromSocket(socket, true);
+  firstMessage->parseData();
+  if(firstMessage->getType() == CLIENT_REGISTER)
+  {
+    Client* c = new Client();
+    c->name = firstMessage->words[0];
+    if (firstMessage->words.size() > 1)
+      c->password = firstMessage->words[1];
+    this->server4->addClient(c);
+    
+    server4->addMulticast(CLIENT_ADDED, &(firstMessage->words));
+
+    runClient(c);
+  }
+  else if (firstMessage->getType() == SERVER_REGISTER)
+  {
+    runServer();
+  }
+  else
+  {
+    std::cout << "invalid connection attempt" << std::endl;
+  }
 }
 
 int Thread::getType()
 {
   return type;
+}
+
+void Thread::ping()
+{
+  Message ping;
+  ping.type = PING;
+  ping.addParameter(server4->identificationTag);
+  ping.buildRawData();
+  Message::MessageToSocket(socket, &ping);
+  lastPingTime = time(0);
 }

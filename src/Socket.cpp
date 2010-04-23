@@ -7,6 +7,7 @@
 #include <netinet/in.h>
 #include <netdb.h>
 #include <stdlib.h>
+#include <errno.h>
 
 using namespace std;
 
@@ -49,7 +50,8 @@ int Socket::bindTo(int port) {
 }
 
 /* Connects to port on different machine */
-int Socket::connectTo(string host, int port) {
+int Socket::connectTo(string host, int port)
+{
 	if (sockState != NEW)
 		return -1;
 
@@ -60,14 +62,16 @@ int Socket::connectTo(string host, int port) {
 	strcpy(cstr, host.c_str());
 
 	server = gethostbyname(cstr);
-	if (server == NULL) {
+	if (server == NULL)
+  {
 		std::cout << "Error: No such host." << std::endl;
 		return -1;
 	}
 	address.sin_family = AF_INET;
 	bcopy((char*) server->h_addr, (char*) &address.sin_addr.s_addr, server->h_length);
 	address.sin_port = htons(port);
-	if (connect(sockfd, (struct sockaddr *) &address, sizeof(address)) < 0) {
+	if (connect(sockfd, (struct sockaddr *) &address, sizeof(address)) < 0)
+  {
 		std::cout << "Error: Failed to connect to socket." << std::endl;
 		return -1;
 	}
@@ -77,7 +81,8 @@ int Socket::connectTo(string host, int port) {
 }
 
 /* Blocks thread till external connection attempt is made */
-Socket* Socket::acceptConn() {
+Socket* Socket::acceptConn()
+{
 	if (sockState != LISTENING)
 		return NULL;
 
@@ -87,8 +92,10 @@ Socket* Socket::acceptConn() {
 	return new Socket(accept(sockfd, (struct sockaddr*) &client_address, &client_length));
 }
 
-int Socket::listenForConn() {
-	if (sockState == BOUND) {
+int Socket::listenForConn()
+{
+	if (sockState == BOUND)
+  {
 		listen(sockfd, 5);
 		sockState = LISTENING;
 		return 0;
@@ -99,30 +106,42 @@ int Socket::listenForConn() {
 /* Reads bytes and removes them from queue if there are bytes to read, else
  * blocks thread. prevReadLen is the amount of chars currently in inBuffer.
  */
-int Socket::readBytes(unsigned char* inBuffer, int prevReadLen, int bytes) {
+int Socket::readBytes(unsigned char* inBuffer, int prevReadLen, int bytes)
+{
 	bzero(inBuffer, prevReadLen);
 	int result = read(sockfd, inBuffer, bytes);
 
-	if (!result) {
-		throw SocketException("Could not read from socket.");
+	if (!result) 
+  {
+    //cout << (result == EWOULDBLOCK) << endl;
+		//throw SocketException("Could not read from socket.");
 	}
 	return result;
 }
 
-/* Reads bytes and leaves them in queue, does not block thread.
+/* Reads bytes and leaves them in queue.
  * prevReadLen is the amount of chars currently in inBuffer.
  */
-int Socket::peekBytes(unsigned char* inBuffer, int prevReadLen, int bytes) {
+int Socket::peekBytes(unsigned char* inBuffer, int prevReadLen, int bytes, bool blocking)
+{
 	bzero(inBuffer, prevReadLen);
-	return recv(sockfd, inBuffer, bytes, MSG_PEEK);
+	return recv(sockfd, inBuffer, bytes, MSG_PEEK | (blocking ? 0 : MSG_DONTWAIT));
 }
 
-int Socket::writeBytes(unsigned char* buffer, int bytes) {
+//int Socket::peekBytesNB(unsigned char* inBuffer, int prevReadLen, int bytes)
+//{
+//  bzero(inBuffer, prevReadLen);
+//  return recv(sockfd, inBuffer, bytes, MSG_PEEK | MSG_DONTWAIT);
+//}
+
+int Socket::writeBytes(unsigned char* buffer, int bytes)
+{
 	return write(sockfd, buffer, bytes);
 }
 
 /* Gets socket file descriptor */
-int Socket::getSockfd() {
+int Socket::getSockfd()
+{
 	return sockfd;
 }
 
@@ -132,11 +151,13 @@ int Socket::getSockfd() {
  * 3 = Connected
  * 4 = Listening
  */
-int Socket::getSockstate() {
+int Socket::getSockstate()
+{
 	return sockState;
 }
 
 /* Gets bound/connected port */
-int Socket::getPort() {
+int Socket::getPort()
+{
 	return port;
 }

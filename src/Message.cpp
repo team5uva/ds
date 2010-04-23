@@ -5,11 +5,17 @@
 #include "Socket.h"
 #include "MessageType.h"
 
-Message* Message::messageFromSocket(Socket* s)
+Message* Message::messageFromSocket(Socket* s, bool blocking)
 {
   unsigned char* message = new unsigned char[200];
+  int bytesPeeked;
   short length;
-  s->peekBytes((unsigned char*)&length, 0, 2);
+
+  bytesPeeked = s->peekBytes((unsigned char*)&length, 0, 2, blocking);
+
+  if(!blocking && bytesPeeked < 0)
+    return NULL;
+
   length = htons(length);
   s->readBytes(message, 0, length);
 
@@ -57,7 +63,7 @@ void Message::parseData()
     if(rawData[i] == ' ' || rawData[i] == '\t')
     {
       if(words.back().length() > 0)
-	words.push_back(string());
+	      words.push_back(string());
     }
     else
       words.back().push_back(rawData[i]);

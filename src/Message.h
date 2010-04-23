@@ -7,15 +7,18 @@ class Message;
 
 using namespace std;
 
-class Message {
-private:
+class Message
+{
 public:
-  int length;
   int type;
+  int length;
   vector<string> words;
   unsigned char* rawData;
+  bool isMulticast;
+  Message* next;
+
   static void MessageToSocket(Socket* s, Message* m);
-  static Message* messageFromSocket(Socket* s);
+  static Message* messageFromSocket(Socket* s, bool blocking);
   Message(unsigned char* data, int length);
   Message();
   void parseData();
@@ -26,3 +29,4 @@ public:
 };
 
 #endif /* MESSAGE_H_ */
+
