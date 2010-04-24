@@ -9,17 +9,16 @@
 using namespace std;
 
 class Client {
-private:
+public:
 
 	string socketaddress;
 	string name;
 	string password;
-	Server* parentSrever;
+	Server* parentServer;
 	int authorizationstatus;
 
-public:
-	Client();
-	~Client();
+	Client(){}
+	~Client(){}
 };
 
 #endif /* CLIENT_H_ */

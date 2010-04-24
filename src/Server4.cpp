@@ -27,12 +27,57 @@ Server4 server4;
 string message = "145.18.29.144:2001:team4-Yo";
 
 
+void Server4::addClient(Client* client)
+{
+  this->clients.push_back(client);
+}
+
+void Server4::addMulticast(Message* msg)
+{
+  pthread_mutex_lock(&m_multicast);
+
+  if(multicastList.size() != 0)
+    multicastList.back()->next = msg;
+  multicastList.push_back(msg);
+
+  /* Might need to delete/destroy the message as well, this needs to be looked at */
+  if(multicastList.size() > 100)
+    multicastList.erase(multicastList.begin());
+
+  pthread_mutex_unlock(&m_multicast);
+}
+
+void Server4::addMulticast(int type, vector<string>* words)
+{
+  Message* msg = new Message;
+
+  msg->type = type;
+
+  for(int i = 0; i < words->size(); i++)
+    msg->addParameter(words->at(i));
+  msg->buildRawData();
+  addMulticast(msg);
+}
+
+Message* Server4::getLatestMulticast()
+{
+  Message* result;
+
+  pthread_mutex_lock(&m_multicast);
+  result = multicastList.back();
+  pthread_mutex_unlock(&m_multicast);
+
+  return result;
+}
+
+
 void Server4::addServer(string address, bool parent){
 
 	Server* server = new Server(address, message, true);
 	server4.servers.push_back(server);
 
-	if(parent){
+	if(parent)
+  {
 		server4.parent = server;
 	}
 }
@@ -50,7 +95,7 @@ void* controlThread(void *_obj) {
 
 	Message* response;
 	while (true) {
-		response = Message::messageFromSocket(&controlServer_socket);
+		response = Message::messageFromSocket(&controlServer_socket, true);
 		response->parseData();
 
 		cout << "From Control Server Message type: " << response->type << "\n";
@@ -115,6 +160,8 @@ int main(int argc, char* argv[])
   listenSocket->listenForConn();
 
   Server4 server4;
+
+  pthread_mutex_init(&(server4.m_multicast), 0);
 
   while(true)
   {

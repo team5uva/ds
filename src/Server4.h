@@ -16,7 +16,7 @@
 using namespace std;
 
 class Server4 {
-private:
+public:
 
 	// loaded from configuration file
 	int port;
@@ -31,15 +31,20 @@ private:
 
 	vector<Client*> clients;
 	vector<Server*> servers;
+  vector<Message*> multicastList;
+  pthread_mutex_t m_multicast;
 
-	enum STATUS {
-			ADMIN = 0,
-			REGULAR = 1
-		};
-
-public:
+	enum STATUS
+  {
+    ADMIN = 0,
+    REGULAR = 1
+	};
 
 	void addServer(string address, bool parent);
+	void addClient(Client* client);
+  void addMulticast(Message* msg);
+  void addMulticast(int type, vector<string>* words);
+  Message* getLatestMulticast();
 
 	Server4(){}
 	~Server4(){}
