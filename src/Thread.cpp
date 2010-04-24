@@ -25,20 +25,21 @@ void Thread::runClient(Client* c)
 {
   while (!m_stoprequested)
   {
-    Message* receivedMessage, * latestMulticast;
+    Message* receivedMessage;
     Message response;
-    bool dontSleep;
+    bool sleep;
 
-    lastPingTime = time(0);
+    lastActivityTime = time(0);
 
-    cout << "started Client Thread" << endl;
-
-    latestMulticast = server4->getLatestMulticast();
+    cout << "Started client thread." << endl;
 
     // Send registration success message to connecting client
     response.type = REGISTRATION_SUCCESS;
     response.buildRawData();
     Message::MessageToSocket(socket,&response);
+
+    /* Send client name to client. */
+    processClientMulticast(latestMulticast);
 
     // Send all other client names to connecting client
     for (int i = 0; i < server4->clients.size(); i++)
@@ -52,20 +53,22 @@ void Thread::runClient(Client* c)
       Message::MessageToSocket(socket, &clientNameMsg);
     }
 
-    while(true)
+    while(!m_stoprequested)
     {
-      dontSleep = false;
+      sleep = true;
       
-      if(lastPingTime + 10 < time(0))
+      if(lastActivityTime + 10 < time(0))
         ping();
       
       receivedMessage = Message::messageFromSocket(socket, false);
 
       if(receivedMessage != NULL)
       {
+        cout << "to client: " << c->name << endl;
         receivedMessage->parseData();
         processClientMessage(c, receivedMessage);
-        dontSleep = true;
+
+        sleep = false;
       }
 
       if(latestMulticast == NULL)
@@ -74,11 +77,13 @@ void Thread::runClient(Client* c)
       {
         latestMulticast = latestMulticast->next;
         processClientMulticast(latestMulticast);
-        dontSleep = true;
+        sleep = false;
       }
 
-      if(!dontSleep)
+      if(sleep)
         usleep(50000);
+      else
+        lastActivityTime = time(0);
     }
   }
 }
@@ -96,7 +101,7 @@ void Thread::processClientMessage(Client* c, Message* msg)
       if(server4->clients[i] == c)
         server4->clients.erase(server4->clients.begin() + i);
     
-    stop();
+    stop(true);
   }
   else if(msg->type == PING)
   {
@@ -135,8 +140,8 @@ void Thread::processClientMessage(Client* c, Message* msg)
   }
   else if(msg->type == PONG)
   {
-    if(lastPingTime + 2 < time(0))
-      stop();
+    if(lastActivityTime + 2 < time(0))
+      stop(true);
   }
   else if(msg->type == SERVER_STOP)
     exit(0);
@@ -165,11 +170,12 @@ void Thread::start(Socket* socket, vector<Thread*>* threads, Server4* server4)
 }
 
 /* Stop the thread. */
-void Thread::stop()
+void Thread::stop(bool isClient)
 {
   assert(m_running == true);
   m_running = false;
   m_stoprequested = true;
+  cout << "Stopping " << (isClient ? "client" : "server") << " thread." << endl;
   pthread_join(m_thread, 0);
 }
 
@@ -184,8 +190,8 @@ void Thread::determineType()
     if (firstMessage->words.size() > 1)
       c->password = firstMessage->words[1];
     this->server4->addClient(c);
-    
-    server4->addMulticast(CLIENT_ADDED, &(firstMessage->words));
+
+    latestMulticast = server4->addMulticast(CLIENT_ADDED, &(firstMessage->words));
 
     runClient(c);
   }
@@ -211,5 +217,5 @@ void Thread::ping()
   ping.addParameter(server4->identificationTag);
   ping.buildRawData();
   Message::MessageToSocket(socket, &ping);
-  lastPingTime = time(0);
+  lastActivityTime = time(0);
 }

@@ -31,7 +31,7 @@ void Server4::addClient(Client* client)
   this->clients.push_back(client);
 }
 
-void Server4::addMulticast(Message* msg)
+Message* Server4::addMulticast(Message* msg)
 {
   pthread_mutex_lock(&m_multicast);
 
@@ -44,9 +44,11 @@ void Server4::addMulticast(Message* msg)
     multicastList.erase(multicastList.begin());
 
   pthread_mutex_unlock(&m_multicast);
+
+  return msg;
 }
 
-void Server4::addMulticast(int type, vector<string>* words)
+Message* Server4::addMulticast(int type, vector<string>* words)
 {
   Message* msg = new Message;
 
@@ -55,7 +57,7 @@ void Server4::addMulticast(int type, vector<string>* words)
   for(int i = 0; i < words->size(); i++)
     msg->addParameter(words->at(i));
   msg->buildRawData();
-  addMulticast(msg);
+  return addMulticast(msg);
 }
 
 Message* Server4::getLatestMulticast()
@@ -78,9 +80,7 @@ void Server4::addServer(string address, bool parent)
 	server4.servers.push_back(server);
 
 	if(parent)
-  {
 		server4.parent = server;
-	}
 }
 
 void* controlThread(void *_obj) {

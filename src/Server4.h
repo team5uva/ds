@@ -42,8 +42,8 @@ public:
 
 	void addServer(string address, bool parent);
 	void addClient(Client* client);
-  void addMulticast(Message* msg);
-  void addMulticast(int type, vector<string>* words);
+  Message* addMulticast(Message* msg);
+  Message* addMulticast(int type, vector<string>* words);
   Message* getLatestMulticast();
 
 	Server4(){}
