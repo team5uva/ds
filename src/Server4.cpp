@@ -69,6 +69,7 @@ void Server4::addClient(Client* client) {
 	this->clients.push_back(client);
 }
 
+
 void Server4::addMulticast(Message* msg) {
 	pthread_mutex_lock(&m_multicast);
 
@@ -96,7 +97,6 @@ void Server4::addMulticast(int type, vector<string>* words) {
 
 Message* Server4::getLatestMulticast() {
 	Message* result;
-
 	pthread_mutex_lock(&m_multicast);
 	result = multicastList.back();
 	pthread_mutex_unlock(&m_multicast);

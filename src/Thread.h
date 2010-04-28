@@ -20,7 +20,8 @@ private:
   Socket* socket;
   vector<Thread*>* threads;
   Server4* server4;
-  time_t lastPingTime;
+  time_t lastActivityTime;
+  Message* latestMulticast;
 
   static void *start_thread(void *obj);
   void determineType();
@@ -43,7 +44,7 @@ public:
   void start(Socket* socket, vector<Thread*>* threads, Server4* server);
 
   /* Stop the thread. */
-  void stop();
+  void stop(bool isClient);
 
 };
 
