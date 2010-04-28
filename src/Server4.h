@@ -40,9 +40,9 @@ public:
 
 	void addServer(Server* server, bool parent);
 	void addClient(Client* client);
-	void addMulticast(Message* msg);
-	void addMulticast(int type, vector<string>* words);
-	Message* getLatestMulticast();
+	Message* addMulticast(Message* msg);
+  Message* addMulticast(int type, vector<string>* words);
+  Message* getLatestMulticast();
 	void deleteServer(string serverTag);
 
 	static void* controlThread(void *_obj);
