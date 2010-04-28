@@ -1,5 +1,5 @@
 #include "MessageTest.h"
-
+/*
 CPPUNIT_TEST_SUITE_REGISTRATION (MessageTest);
 
 void MessageTest :: setUp (void)
@@ -29,7 +29,7 @@ void MessageTest :: ParseMessageTest (void)
       CPPUNIT_ASSERT_EQUAL (a->words[i], b->words[i]);   
     }
 }
-/*
+
 
 void MessageTest :: subTest (void)
 {

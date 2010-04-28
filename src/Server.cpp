@@ -5,6 +5,9 @@
 #include <iostream>
 #include <cstdlib>
 
+Socket controlSrv_socket;
+string targetServerName;
+
 void* Server::parentServerThread(void *_obj) {
 
 	Server* server = (Server*) _obj;
@@ -17,37 +20,61 @@ void* Server::parentServerThread(void *_obj) {
 
 	Socket server_socket;
 
-	if (server_socket.connectTo(server->getIpAddress(), server->getPort()) >= 0) {
+	//if (server_socket.connectTo(server->getIpAddress(), server->getPort()) >= 0) {
+	if (server_socket.connectTo("localhost", server->getPort()) >= 0) {
 		std::cout << "made connection with parent" << std::endl;
 
 		Message::MessageToSocket(&server_socket, &m);
 
 		Message* response;
 		while (true) {
-			response = Message::messageFromSocket(&server_socket);
+			response = Message::messageFromSocket(&server_socket, true);
 			response->parseData();
 
 			std::cout << "From parent Server Message type: " << response->type << "\n\n";
+			if (response->type == PING) {
+
+				Message msg;
+				msg.type = PONG;
+				msg.buildRawData();
+
+				Message::MessageToSocket(&server_socket, &msg);
+
+			} else {
+				//BREAKING CONNECTION   MSS 603 to CONTROL SERVER
+
+				Message msg;
+				msg.type = PEER_LOST;
+				msg.addParameter(targetServerName);
+				msg.buildRawData();
+
+				Message::MessageToSocket(&controlSrv_socket, &msg);
+
+				return 0;
+			}
 		}
 	}
 	return 0;
 }
 
-Server::Server(string socketaddress, string ownSocketaddress, bool parent) {
+Server::Server(string name) {
 
-	this->ownSocketaddress = ownSocketaddress;
+	targetServerName = name;
 	int counter = 0;
 
-	for (unsigned int i = 0; i < socketaddress.length(); i++) {
+	for (unsigned int i = 0; i < targetServerName.length(); i++) {
 
-		if (socketaddress.at(i) != ':') {
-			this->serverAddress[counter].append(1, socketaddress.at(i));
+		if (targetServerName.at(i) != ':') {
+			this->serverAddress[counter].append(1, targetServerName.at(i));
 
 		} else {
 			counter++;
 		}
 	}
-	std::cout << "serverAddress: " << serverAddress[0] << "\n\n";
+}
+
+void Server::connectToParent(string ownSocketaddress){
+	this->ownSocketaddress = ownSocketaddress;
 
 	pthread_t server_thread;
 	if (parent) {
@@ -59,6 +86,18 @@ string Server::getIpAddress() {
 	return serverAddress[0];
 }
 
+string Server::getTag() {
+	return serverAddress[2];
+}
+
 int Server::getPort() {
 	return std::atoi(serverAddress[1].c_str());
+}
+
+void Server::setControlSocket(Socket &socket) {
+	controlSrv_socket = socket;
+}
+
+Server::~Server(){
+	std::cout << "DESTROYING SEVER" << serverAddress[2] << std::endl;
 }

@@ -6,12 +6,14 @@
 #include "Message.h"
 
 using namespace std;
-
+/*
 class MessageTest : public CPPUNIT_NS :: TestFixture
 {
+
     CPPUNIT_TEST_SUITE (MessageTest);
     CPPUNIT_TEST (ParseMessageTest);
     CPPUNIT_TEST_SUITE_END ();
+
 
     public:
         void setUp (void);
@@ -22,5 +24,5 @@ class MessageTest : public CPPUNIT_NS :: TestFixture
     private:
         Message *a, *b;
 };
-
+*/
 #endif

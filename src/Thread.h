@@ -24,7 +24,7 @@ private:
 
   static void *start_thread(void *obj);
   void determineType();
-  void runServer();
+  void runServer(Server* s);
   void runClient(Client* c);
   void processClientMessage(Client* c, Message* msg);
   void processClientMulticast(Message* msg);

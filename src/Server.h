@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include "Socket.h"
 
 using namespace std;
 
@@ -13,12 +14,15 @@ private:
 	string ownSocketaddress;
 
 public:
-	Server(string socketaddress, string ownSocketaddress, bool parent);
+	Server(string name);
 	~Server();
 
+	void connectToParent(string);
 	string getIpAddress();
+	string getTag();
 	int getPort();
 	static void* parentServerThread(void *_obj);
+	void setControlSocket(Socket &socket);
 };
 
 #endif /* SERVER_H_ */

@@ -41,7 +41,7 @@ int Socket::bindTo(int port) {
 	address.sin_addr.s_addr = INADDR_ANY;
 	address.sin_port = htons(port);
 	if (bind(sockfd, (struct sockaddr *) &address, sizeof(address)) < 0) {
-		std::cout << "Error: Failed to bind port to socket" << std::endl;
+		std::cout << "Error: Failed to bind port to socket " << port << std::endl;
 		return -1;
 	}
 

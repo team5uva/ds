@@ -1,5 +1,4 @@
 
-
 #ifndef SERVER4_H_
 #define SERVER4_H_
 
@@ -22,6 +21,7 @@ public:
 	int port;
 	string controlServerAddress;
 	string identificationTag;
+	string address;
 	vector<Admin*> administrators;
 
 	bool connected;
@@ -31,23 +31,25 @@ public:
 
 	vector<Client*> clients;
 	vector<Server*> servers;
-  vector<Message*> multicastList;
-  pthread_mutex_t m_multicast;
+	vector<Message*> multicastList;
+	pthread_mutex_t m_multicast;
 
-	enum STATUS
-  {
-    ADMIN = 0,
-    REGULAR = 1
+	enum STATUS {
+		ADMIN = 0, REGULAR = 1
 	};
 
-	void addServer(string address, bool parent);
+	void addServer(Server* server, bool parent);
 	void addClient(Client* client);
-  void addMulticast(Message* msg);
-  void addMulticast(int type, vector<string>* words);
-  Message* getLatestMulticast();
+	void addMulticast(Message* msg);
+	void addMulticast(int type, vector<string>* words);
+	Message* getLatestMulticast();
+	void deleteServer(string serverTag);
 
-	Server4(){}
-	~Server4(){}
+	static void* controlThread(void *_obj);
+
+	Server4();
+	~Server4() {
+	}
 };
 
 #endif /* SERVER4_H_ */
