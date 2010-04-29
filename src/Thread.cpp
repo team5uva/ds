@@ -156,8 +156,6 @@ void Thread::runServer(Server* s) {
     //Connected clients given to new server
     pthread_mutex_lock(&(server4->m_clients));
     for (int i = 0; i < server4->clients.size(); i++) {
-      if (server4->clients[i] == c)
-        continue;
       Message clientNameMsg;
       clientNameMsg.type = CLIENT_ADDED;
       clientNameMsg.addParameter(server4->clients[i]->name);
@@ -167,7 +165,7 @@ void Thread::runServer(Server* s) {
     pthread_mutex_unlock(&(server4->m_clients));
 
     //Connected servers to new server
-    server.
+
   }
 }
 
