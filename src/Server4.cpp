@@ -153,6 +153,7 @@ void* Server4::controlThread(void *_obj) {
 
 				//Create parent server
 				Server* server = new Server(response->words[0]);
+				server->server4 = server4;
 				server4->addServer(server, true);
 
 			} else {

@@ -2,8 +2,10 @@
 #ifndef CLIENT_H_
 #define CLIENT_H_
 
-#include "Server4.h"
+
 #include <string>
+
+class Server;
 
 using namespace std;
 
