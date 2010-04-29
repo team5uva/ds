@@ -286,8 +286,7 @@ void Thread::determineType() {
     this->server4->addServer(s, false);
 
     //server4->addBroadcast(CLIENT_ADDED, &(firstMessage->words));
-
-    runServer(s);
+    //runServer(s);
 
   } else {
     std::cout << "invalid connection attempt" << std::endl;

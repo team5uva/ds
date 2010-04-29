@@ -1,4 +1,3 @@
-
 #ifndef SERVER4_H_
 #define SERVER4_H_
 
@@ -25,7 +24,7 @@ public:
 	vector<Admin*> administrators;
 
 	bool connected;
-	Server* parent;
+	Server* parentServer;
 	Logger* logger;
 	pthread_t mainthread;
 
@@ -33,7 +32,7 @@ public:
 	vector<Server*> servers;
 	vector<Message*> broadcastList;
 	pthread_mutex_t m_broadcast, m_clients;
-  Socket* listenSocket;
+	Socket* listenSocket;
 
 	enum STATUS {
 		ADMIN = 0, REGULAR = 1
@@ -42,9 +41,10 @@ public:
 	void addServer(Server* server, bool parent);
 	void addClient(Client* client);
 	Message* addBroadcast(Message* msg);
-  Message* addBroadcast(int type, vector<string>* words);
-  Message* getLatestBroadcast();
+	Message* addBroadcast(int type, vector<string>* words);
+	Message* getLatestBroadcast();
 	void deleteServer(string serverTag);
+	void connectToControl(Server4* server4);
 
 	static void* controlThread(void *_obj);
 

@@ -42,19 +42,24 @@ void* Server::parentServerThread(void *_obj) {
 
 			} else {
 				//BREAKING CONNECTION   MSS 603 to CONTROL SERVER
-
-				Message msg;
-				msg.type = PEER_LOST;
-				msg.addParameter(targetServerName);
-				msg.buildRawData();
-
-				Message::MessageToSocket(&controlSrv_socket, &msg);
-
+				server->messageToControl(PEER_LOST, targetServerName);
 				return 0;
 			}
 		}
+	} else {
+		std::cout << "The Parent Server is not responding. Send message PEER_LOST to Control... " << "\n\n";
+		server->messageToControl(PEER_LOST, targetServerName);
 	}
 	return 0;
+}
+
+void Server::messageToControl(int mssType, string parameter) {
+	Message msg;
+	msg.type = mssType;
+	msg.addParameter(parameter);
+	msg.buildRawData();
+
+	Message::MessageToSocket(&controlSrv_socket, &msg);
 }
 
 Server::Server(string name) {
@@ -73,7 +78,7 @@ Server::Server(string name) {
 	}
 }
 
-void Server::connectToParent(string ownSocketaddress){
+void Server::connectToParent(string ownSocketaddress) {
 	this->ownSocketaddress = ownSocketaddress;
 
 	pthread_t server_thread;
@@ -98,6 +103,5 @@ void Server::setControlSocket(Socket &socket) {
 	controlSrv_socket = socket;
 }
 
-Server::~Server(){
-	std::cout << "DESTROYING SEVER" << serverAddress[2] << std::endl;
+Server::~Server() {
 }

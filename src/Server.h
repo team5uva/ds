@@ -23,6 +23,7 @@ public:
 	int getPort();
 	static void* parentServerThread(void *_obj);
 	void setControlSocket(Socket &socket);
+	void messageToControl(int mssType, string parameter);
 };
 
 #endif /* SERVER_H_ */
