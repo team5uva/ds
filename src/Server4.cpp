@@ -112,7 +112,7 @@ void Server4::addServer(Server* server, bool parent) {
 
 	servers.push_back(server);
 
-	if (parent) {
+	if (parent == NULL) {
 		parentServer = server;
 		parentServer->setControlSocket(controlServer_socket);
 		parentServer->connectToParent(address);
