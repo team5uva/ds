@@ -47,10 +47,6 @@ Server4::Server4() {
 		port = config.getListenPort();
 		identificationTag = config.getTag();
 
-		listenSocket = new Socket;
-		port = listenSocket->bindTo(port);
-		listenSocket->listenForConn();
-
 		address.append("87.210.237.85:");
 		stringstream out;
 		out << port;
@@ -203,7 +199,7 @@ void Server4::connectToControl(Server4* server4) {
 
 	cout << "To Control Server Message: " << m.words[0] << "\n";
 
-	controlServer_socket.connectTo("146.50.1.102", 2001);
+	controlServer_socket.connectTo("146.50.1.95", 2001);
 	Message::MessageToSocket(&controlServer_socket, &m);
 
 }
@@ -214,6 +210,10 @@ int main(int argc, char* argv[]) {
 	Socket *clientSocket = new Socket;
 
 	Server4 server4;
+
+	server4.listenSocket = new Socket;
+	server4.port = server4.listenSocket->bindTo(server4.port);
+	server4.listenSocket->listenForConn();
 
 	all = new Client();
 	all->name = all->changedName = "#all";
