@@ -151,57 +151,23 @@ void Thread::runServer(Server* s) {
     bool sleep;
 
     lastActivityTime = time(0);
-    //
-    //    cout << "Started server thread." << endl;
-    //
-    //    // Send registration success message to connecting client
-    //    response.type = REGISTRATION_SUCCESS;
-    //    response.buildRawData();
-    //    Message::MessageToSocket(socket, &response);
-    //
-    //    /* Send client name to client. */
-    //    processClientBroadcast(latestBroadcast);
-    //
-    //    // Send all other client names to connecting client
-    //    for (int i = 0; i < server4->clients.size(); i++) {
-    //      if (server4->clients[i] == c)
-    //        continue;
-    //      Message clientNameMsg;
-    //      clientNameMsg.type = CLIENT_ADDED;
-    //      clientNameMsg.addParameter(server4->clients[i]->name);
-    //      clientNameMsg.buildRawData();
-    //      Message::MessageToSocket(socket, &clientNameMsg);
-    //    }
-    //
-    //    while (!m_stoprequested) {
-    //      sleep = true;
-    //
-    //      if (lastActivityTime + 10 < time(0))
-    //        ping();
-    //
-    //      receivedMessage = Message::messageFromSocket(socket, false);
-    //
-    //      if (receivedMessage != NULL) {
-    //        cout << "to client: " << c->name << endl;
-    //        receivedMessage->parseData();
-    //        processClientMessage(c, receivedMessage);
-    //
-    //        sleep = false;
-    //      }
-    //
-    //      if (latestBroadcast == NULL)
-    //        latestBroadcast = server4->getLatestBroadcast();
-    //      else if (latestBroadcast->next != NULL) {
-    //        latestBroadcast = latestBroadcast->next;
-    //        processClientBroadcast(latestBroadcast);
-    //        sleep = false;
-    //      }
-    //
-    //      if (sleep)
-    //        usleep(50000);
-    //      else
-    //        lastActivityTime = time(0);
-    //    }
+    cout << "Started server thread." << endl;
+    
+    //Connected clients given to new server
+    pthread_mutex_lock(&(server4->m_clients));
+    for (int i = 0; i < server4->clients.size(); i++) {
+      if (server4->clients[i] == c)
+        continue;
+      Message clientNameMsg;
+      clientNameMsg.type = CLIENT_ADDED;
+      clientNameMsg.addParameter(server4->clients[i]->name);
+      clientNameMsg.buildRawData();
+      Message::MessageToSocket(socket, &clientNameMsg);
+    }
+    pthread_mutex_unlock(&(server4->m_clients));
+
+    //Connected servers to new server
+    server.
   }
 }
 
