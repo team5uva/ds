@@ -31,8 +31,9 @@ public:
 
 	vector<Client*> clients;
 	vector<Server*> servers;
-	vector<Message*> multicastList;
-	pthread_mutex_t m_multicast;
+	vector<Message*> broadcastList;
+	pthread_mutex_t m_broadcast, m_clients;
+  Socket* listenSocket;
 
 	enum STATUS {
 		ADMIN = 0, REGULAR = 1
@@ -40,9 +41,9 @@ public:
 
 	void addServer(Server* server, bool parent);
 	void addClient(Client* client);
-	Message* addMulticast(Message* msg);
-  Message* addMulticast(int type, vector<string>* words);
-  Message* getLatestMulticast();
+	Message* addBroadcast(Message* msg);
+  Message* addBroadcast(int type, vector<string>* words);
+  Message* getLatestBroadcast();
 	void deleteServer(string serverTag);
 
 	static void* controlThread(void *_obj);

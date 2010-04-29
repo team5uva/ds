@@ -27,26 +27,32 @@ Socket::Socket(int sockfd) {
 }
 
 Socket::~Socket() {
+  cout << "Socket destroyed." << endl;
 	shutdown(sockfd, 1);
 	close(sockfd);
 }
 
-/* Binds socket to port */
+/* Binds socket to port, returns bound port. Returns -1 on failure. */
 int Socket::bindTo(int port) {
+  int initialPort;
+  bool bound = false;
+
 	if (sockState != NEW)
 		return -1;
 	struct sockaddr_in address = { };
 
 	address.sin_family = AF_INET;
 	address.sin_addr.s_addr = INADDR_ANY;
-	address.sin_port = htons(port);
-	if (bind(sockfd, (struct sockaddr *) &address, sizeof(address)) < 0) {
-		std::cout << "Error: Failed to bind port to socket " << port << std::endl;
-		return -1;
-	}
+  while(!bound) {
+    address.sin_port = htons(port++);
+    bound = bind(sockfd, (struct sockaddr *) &address, sizeof(address)) >= 0;
+
+    if(initialPort < port - 10)
+      return -1;
+  }
 
 	sockState = BOUND;
-	return 0;
+	return port - 1;
 }
 
 /* Connects to port on different machine */

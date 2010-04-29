@@ -2,7 +2,6 @@
 #ifndef CLIENT_H_
 #define CLIENT_H_
 
-#include "Server.h"
 #include "Server4.h"
 #include <string>
 
@@ -13,9 +12,10 @@ public:
 
 	string socketaddress;
 	string name;
+  string changedName;
 	string password;
 	Server* parentServer;
-	int authorizationstatus;
+  bool isAdmin;
 
 	Client(){}
 	~Client(){}

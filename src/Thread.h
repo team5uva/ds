@@ -18,17 +18,16 @@ private:
   pthread_mutex_t m_mutex;
   pthread_t m_thread;
   Socket* socket;
-  vector<Thread*>* threads;
   Server4* server4;
   time_t lastActivityTime;
-  Message* latestMulticast;
+  Message* latestBroadcast;
 
   static void *start_thread(void *obj);
   void determineType();
   void runServer(Server* s);
   void runClient(Client* c);
   void processClientMessage(Client* c, Message* msg);
-  void processClientMulticast(Message* msg);
+  void processClientBroadcast(Client* c, Message* msg);
   void ping();
 
 public:
@@ -41,7 +40,7 @@ public:
 	~Thread();
 
   /* Start the thread. */
-  void start(Socket* socket, vector<Thread*>* threads, Server4* server);
+  void start(Socket* socket, Server4* server);
 
   /* Stop the thread. */
   void stop(bool isClient);

@@ -10,9 +10,9 @@ class Admin {
 private:
 
 public:
-
     string name;
     string password;
+
     Admin(){}
     ~Admin();
 };
