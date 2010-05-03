@@ -8,6 +8,8 @@
 #include <string>
 #include <cstring>
 #include <stdlib.h>
+#include <unistd.h>
+#include <netdb.h>
 #include <pthread.h>
 #include "Server4.h"
 #include "Server.h"
@@ -15,6 +17,7 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <arpa/inet.h>
 #include "Admin.h"
 #include "Thread.h"
 #include "Message.h"
@@ -47,7 +50,12 @@ Server4::Server4() {
 		port = config.getListenPort();
 		identificationTag = config.getTag();
 
-		address.append("87.210.237.85:");
+		char buf[100];
+		gethostname(buf, 100);
+		struct hostent *host_entry;
+	        host_entry = gethostbyname(buf);
+		address.append(inet_ntoa(*((struct in_addr *)host_entry->h_addr_list[0])));
+		address.append(":");
 		stringstream out;
 		out << port;
 		address.append(out.str());
