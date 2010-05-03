@@ -1,7 +1,6 @@
 #ifndef SERVER4_H_
 #define SERVER4_H_
 
-#include "Server.h"
 #include "Admin.h"
 #include "Logger.h"
 #include "Client.h"
@@ -12,6 +11,7 @@
 #include <vector>
 
 using namespace std;
+class Server;
 
 class Server4 {
 public:

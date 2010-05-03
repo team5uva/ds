@@ -120,7 +120,7 @@ void Server4::addServer(Server* server, bool parent) {
 
 	servers.push_back(server);
 
-	if (parent) {
+	if (parent == NULL) {
 		parentServer = server;
 		parentServer->setControlSocket(controlServer_socket);
 		parentServer->connectToParent(address);
@@ -161,6 +161,7 @@ void* Server4::controlThread(void *_obj) {
 
 				//Create parent server
 				Server* server = new Server(response->words[0]);
+				server->server4 = server4;
 				server4->addServer(server, true);
 
 			} else {

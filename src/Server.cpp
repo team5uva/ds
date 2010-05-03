@@ -1,5 +1,7 @@
 #include "Server.h"
+#include "Server4.h"
 #include "Message.h"
+#include "Client.h"
 #include "Socket.h"
 #include "MessageType.h"
 #include <iostream>
@@ -20,8 +22,8 @@ void* Server::parentServerThread(void *_obj) {
 
 	Socket server_socket;
 
-	//if (server_socket.connectTo(server->getIpAddress(), server->getPort()) >= 0) {
-	if (server_socket.connectTo("localhost", server->getPort()) >= 0) {
+	if (server_socket.connectTo(server->getIpAddress(), server->getPort()) >= 0) {
+	//if (server_socket.connectTo("localhost", server->getPort()) >= 0) {
 		std::cout << "made connection with parent" << std::endl;
 
 		Message::MessageToSocket(&server_socket, &m);
@@ -40,11 +42,20 @@ void* Server::parentServerThread(void *_obj) {
 
 				Message::MessageToSocket(&server_socket, &msg);
 
+			} else if(response->type == CLIENT_ADDED) {
+			        Client* c = new Client();
+			        c->name = response->words[0];
+			        c->parentServer = server;
+			        c->isAdmin = false;
+			        
+			        server->server4->addClient(c);
+			        server->server4->addBroadcast(response);
 			} else {
 				//BREAKING CONNECTION   MSS 603 to CONTROL SERVER
 				server->messageToControl(PEER_LOST, targetServerName);
 				return 0;
 			}
+			
 		}
 	} else {
 		std::cout << "The Parent Server is not responding. Send message PEER_LOST to Control... " << "\n\n";

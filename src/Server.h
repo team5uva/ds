@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include "Socket.h"
+class Server4;
 
 using namespace std;
 
@@ -16,6 +17,8 @@ private:
 public:
 	Server(string name);
 	~Server();
+
+	Server4* server4;
 
 	void connectToParent(string);
 	string getIpAddress();

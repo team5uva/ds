@@ -165,7 +165,9 @@ void Thread::runServer(Server* s) {
     pthread_mutex_unlock(&(server4->m_clients));
 
     //Connected servers to new server
-
+    while (1)
+    {
+    }
   }
 }
 
@@ -250,7 +252,7 @@ void Thread::determineType() {
     this->server4->addServer(s, false);
 
     //server4->addBroadcast(CLIENT_ADDED, &(firstMessage->words));
-    //runServer(s);
+    runServer(s);
 
   } else {
     std::cout << "invalid connection attempt" << std::endl;
