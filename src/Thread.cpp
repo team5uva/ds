@@ -289,6 +289,12 @@ void Thread::stop(bool isClient) {
 
 void Thread::determineType() {
   Message* firstMessage = Message::messageFromSocket(socket, true);
+  if (firstMessage == NULL)
+  {
+    cout << "incoming connection with invalid first message, quiting" << endl;
+    stop(false);
+    return;
+  }
   firstMessage->parseData();
   bool registered = false;
 
