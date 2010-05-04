@@ -263,8 +263,11 @@ void Thread::processServerMessage(Server* s, Message* m) {
      c->name = c->changedName = m->words[0];
      c->isAdmin = false;
      c->parentServer = s;
+     response.type = CLIENT_ADDED;
+     response.words = m->words;
+     response.origin = s;
      this->server4->addClient(c);
-     server4->addBroadcast(CLIENT_ADDED, &(m->words));
+     server4->addBroadcast(&response);
    } else if (m->type == CLIENT_REMOVED_FROM_SERVER) {
 
        pthread_mutex_lock(&(server4->m_clients));
