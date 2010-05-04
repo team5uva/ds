@@ -4,6 +4,7 @@
 #include <vector>
 class Socket;
 class Message;
+class Server;
 
 using namespace std;
 
@@ -16,6 +17,7 @@ public:
   unsigned char* rawData;
   bool isMulticast;
   Message* next;
+  Server* origin;
 
   static void MessageToSocket(Socket* s, Message* m);
   static Message* messageFromSocket(Socket* s, bool blocking);

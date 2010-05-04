@@ -260,12 +260,36 @@ void Thread::processServerMessage(Server* s, Message* m) {
      c->parentServer = s;
      this->server4->addClient(c);
      server4->addBroadcast(CLIENT_ADDED, &(m->words));
-   } 
+   } else if (m->type == CLIENT_REMOVED_FROM_SERVER) {
+
+       pthread_mutex_lock(&(server4->m_clients));
+       for (int i = 0; i < server4->clients.size(); i++)
+	 if (server4->clients[i]->name == m->words[0])
+	   server4->clients.erase(server4->clients.begin() + i);
+       pthread_mutex_unlock(&(server4->m_clients));
+     response.type = CLIENT_REMOVED_FROM_SERVER;
+     response.words = m->words;
+     response.origin = s;
+      
+     server4->addBroadcast(CLIENT_REMOVED_FROM_SERVER, &(m->words));
+
+   } else if(m->type == TEXT_FROM_SERVER) { 
+
+   } else if(m->type == ACTION_FROM_SERVER) {
+
+   } else if(m->type == NAMECHANGE_FROM_SERVER) {
+
+   } else if(m->type == SERVER_REGISTER) {
+
+   }
 }
 
 void Thread::processServerBroadcast(Server* s, Message* m) {
-
+  if(m->type == CLIENT_REMOVED_FROM_SERVER && m->origin != s) {
+      Message::MessageToSocket(socket, m);
+  }
 }
+
 
 /* Start the thread. */
 void Thread::start(Socket* socket, Server4* server4) {

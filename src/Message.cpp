@@ -35,12 +35,14 @@ Message::Message(unsigned char* data, int length)
 {
   this->rawData = data;
   this->length = length;
+  origin = NULL;
 }
 
 Message::Message()
 {
   this->rawData = new unsigned char[200];
   this->length = 0;
+  origin = NULL;
 }
 
 int Message::getType()
