@@ -272,21 +272,43 @@ void Thread::processServerMessage(Server* s, Message* m) {
      response.words = m->words;
      response.origin = s;
       
-     server4->addBroadcast(CLIENT_REMOVED_FROM_SERVER, &(m->words));
+     server4->addBroadcast(&response);
 
    } else if(m->type == TEXT_FROM_SERVER) { 
-
+     response.type = TEXT_FROM_SERVER;
+     response.words = m->words;
+     response.origin = s;
+     server4->addBroadcast(&response);
    } else if(m->type == ACTION_FROM_SERVER) {
-
+     response.type = ACTION_FROM_SERVER;
+     response.words = m->words;
+     response.origin = s;
+     server4->addBroadcast(&response);
    } else if(m->type == NAMECHANGE_FROM_SERVER) {
-
+     response.type = NAMECHANGE_FROM_SERVER;
+     response.words = m->words;
+     response.origin = s;
+     server4->addBroadcast(&response);
    } else if(m->type == SERVER_REGISTER) {
-
+     response.type = SERVER_REGISTER;
+     response.words = m->words;
+     response.origin = s;
+     server4->addBroadcast(&response); 
    }
 }
 
 void Thread::processServerBroadcast(Server* s, Message* m) {
   if(m->type == CLIENT_REMOVED_FROM_SERVER && m->origin != s) {
+      Message::MessageToSocket(socket, m);
+  } else if(m->type == CLIENT_ADDED && m->origin != s) {
+      Message::MessageToSocket(socket, m);
+  } else if(m->type == TEXT_FROM_SERVER && m->origin != s) {
+      Message::MessageToSocket(socket, m);
+  } else if(m->type == ACTION_FROM_SERVER && m->origin != s) {
+      Message::MessageToSocket(socket, m);
+  } else if(m->type == NAMECHANGE_FROM_SERVER && m->origin != s) {
+      Message::MessageToSocket(socket, m);
+  } else if(m->type == SERVER_REGISTER && m->origin != s) {
       Message::MessageToSocket(socket, m);
   }
 }
