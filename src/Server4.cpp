@@ -218,7 +218,6 @@ void Server4::connectToControl(Server4* server4) {
 
 int main(int argc, char* argv[]) {
 	Thread* thread;
-	Client* all;
 	Socket *clientSocket = new Socket;
 
 	Server4 server4;
@@ -226,10 +225,6 @@ int main(int argc, char* argv[]) {
 	server4.listenSocket = new Socket;
 	server4.port = server4.listenSocket->bindTo(server4.port);
 	server4.listenSocket->listenForConn();
-
-	all = new Client();
-	all->name = all->changedName = "#all";
-	server4.addClient(all);
 
 	while (true) {
 		clientSocket = server4.listenSocket->acceptConn();
