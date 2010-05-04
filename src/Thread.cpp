@@ -28,6 +28,7 @@ void Thread::runClient(Client* c) {
     bool sleep;
 
     lastActivityTime = time(0);
+    waiting_for_pong = false;
 
     cout << "Started client thread." << endl;
 
@@ -55,14 +56,21 @@ void Thread::runClient(Client* c) {
     while (!m_stoprequested) {
       sleep = true;
 
-      if (lastActivityTime + 10 < time(0))
+      if (lastActivityTime + 10 < time(0) && !waiting_for_pong)
         ping();
+      else if (lastActivityTime + 12 < time(0) && waiting_for_pong)
+      {
+	std::cout << "ending connection, no pong in correct time" << std::endl;
+	stop(true);
+      }
+
 
       receivedMessage = Message::messageFromSocket(socket, false);
 
       if (receivedMessage != NULL) {
-        cout << "to client: " << c->name << endl;
+        cout << "from client: " << c->name << endl;
         receivedMessage->parseData();
+	cout << "received message with type: " << receivedMessage->getType() << endl;
 
         processClientMessage(c, receivedMessage);
 
@@ -128,8 +136,7 @@ void Thread::processClientMessage(Client* c, Message* msg) {
     msg->words.insert(msg->words.begin(), c->changedName);
     server4->addBroadcast(ACTION_FROM_SERVER, &(msg->words));
   } else if (msg->type == PONG) {
-    if (lastActivityTime + 2 < time(0))
-      stop(true);
+    waiting_for_pong = false;
   } else if (msg->type == SERVER_STOP && c->isAdmin)
     exit(0);
 }
@@ -270,4 +277,5 @@ void Thread::ping() {
   ping.buildRawData();
   Message::MessageToSocket(socket, &ping);
   lastActivityTime = time(0);
+  waiting_for_pong = true;
 }

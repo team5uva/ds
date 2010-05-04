@@ -20,6 +20,7 @@ private:
   Socket* socket;
   Server4* server4;
   time_t lastActivityTime;
+  bool waiting_for_pong;
   Message* latestBroadcast;
 
   static void *start_thread(void *obj);
