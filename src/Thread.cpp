@@ -357,6 +357,7 @@ void Thread::startParentConnection()
   m.buildRawData();
 
   Socket server_socket;
+  socket = & server_socket;
 
   if (server_socket.connectTo(server->getIpAddress(), server->getPort()) >= 0) {
     std::cout << "made connection with parent" << std::endl;
