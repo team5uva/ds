@@ -152,5 +152,3 @@ void Thread::processClientBroadcast(Client* c, Message* msg) {
       msg->words[1].compare("#all") == 0))
     Message::MessageToSocket(socket, msg);
 }
-
-
