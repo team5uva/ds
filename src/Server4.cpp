@@ -18,6 +18,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <sstream>
 #include "Admin.h"
 #include "Thread.h"
 #include "Message.h"
@@ -49,7 +50,9 @@ Server4::Server4() {
 
 		port = config.getListenPort();
 		identificationTag = config.getTag();
-
+		std::ostringstream oss;
+		oss << (random()%1000000000);
+		identificationTag.append(oss.str());
 		char buf[100];
 		gethostname(buf, 100);
 		struct hostent *host_entry;
