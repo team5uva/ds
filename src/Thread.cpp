@@ -58,7 +58,7 @@ void Thread::runClient(Client* c) {
 
       if (lastActivityTime + 10 < time(0) && !waiting_for_pong)
         ping();
-      else if (lastActivityTime + 12 < time(0) && waiting_for_pong)
+      else if (lastActivityTime + 2 < time(0) && waiting_for_pong)
       {
 	std::cout << "ending connection, no pong in correct time" << std::endl;
 	stop(true);
