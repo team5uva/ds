@@ -218,8 +218,33 @@ void Thread::runServer(Server* s) {
 
 void Thread::processServerMessage(Server* s, Message* m) {
   /* Message types to handle:
-     
+     300 - TEXT_FROM_SERVER
+     310 - ACTION_FROM_SERVER
+     110 - CLIENT_ADDED
+     130 - CLIENT_REMOVED_FROM_SERVER
+     140 - PING
+     150 - PONG
+     170 - NAMECHANGE_SERVER
+     600 - SERVER_REGISTER
    */
+   Message response;
+   
+   if(m->type == PING) {
+     reponse.type = PONG;
+     response.addParameter(m->words.at(0));
+     response.buildRawData();
+     Message::MessageToSocket(socket, &response);
+   } else if (m->type == PONG) {
+     waiting_for_pong = false;
+   } else if (m->type == CLIENT_ADDED) {
+     Client* c = new Client();
+     do {
+       c->name = c->changedName = m->words[0];
+       c->isAdmin = false;
+       c->parentServer = s;
+       this->server4->addClient(c);
+       server4->addBroadcast(CLIENT_ADDED, &(m->words));
+   } 
 }
 
 void Thread::processServerBroadcast(Server* s, Message* m) {
