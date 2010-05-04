@@ -24,6 +24,7 @@
 #include "Message.h"
 #include "Thread.h"
 #include "MessageType.h"
+#include <time.h>
 
 using namespace std;
 
@@ -51,6 +52,7 @@ Server4::Server4() {
 		port = config.getListenPort();
 		identificationTag = config.getTag();
 		std::ostringstream oss;
+		srandom(time(0));
 		oss << (random()%1000000000);
 		identificationTag.append(oss.str());
 		char buf[100];
