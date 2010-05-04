@@ -230,7 +230,7 @@ void Thread::processServerMessage(Server* s, Message* m) {
    Message response;
    
    if(m->type == PING) {
-     reponse.type = PONG;
+     response.type = PONG;
      response.addParameter(m->words.at(0));
      response.buildRawData();
      Message::MessageToSocket(socket, &response);
@@ -238,12 +238,11 @@ void Thread::processServerMessage(Server* s, Message* m) {
      waiting_for_pong = false;
    } else if (m->type == CLIENT_ADDED) {
      Client* c = new Client();
-     do {
-       c->name = c->changedName = m->words[0];
-       c->isAdmin = false;
-       c->parentServer = s;
-       this->server4->addClient(c);
-       server4->addBroadcast(CLIENT_ADDED, &(m->words));
+     c->name = c->changedName = m->words[0];
+     c->isAdmin = false;
+     c->parentServer = s;
+     this->server4->addClient(c);
+     server4->addBroadcast(CLIENT_ADDED, &(m->words));
    } 
 }
 
