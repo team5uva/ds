@@ -185,6 +185,8 @@ void* Server4::controlThread(void *_obj) {
 			Message::MessageToSocket(&controlServer_socket, &msg);
 
 		} else if (response->type == REGROUP) {
+		        if (response->words.size() == 1)
+			  response->words[1] = "none";
 
 			cout << "REGROUP: " << response->words[0] << " new parent: " << response->words[1] << "\n\n";
 
