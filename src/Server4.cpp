@@ -185,12 +185,14 @@ void* Server4::controlThread(void *_obj) {
 			Message::MessageToSocket(&controlServer_socket, &msg);
 
 		} else if (response->type == REGROUP) {
+		        if (response->words.size() == 1)
+			  response->words.push_back("none");
 
 			cout << "REGROUP: " << response->words[0] << " new parent: " << response->words[1] << "\n\n";
 
 			server4->deleteServer(response->words[0]);
 
-			if (response->words[1] != "none") {
+			if (response->words[1] != "none" || response->words[1] == "") {
 				cout << "Got parent server address: " << response->words[1] << "\n\n";
 
 				//Create parent server

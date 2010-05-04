@@ -66,6 +66,7 @@ void Thread::runClient(Client* c) {
 	Message* response = new Message();
 	response->type = CLIENT_REMOVED_FROM_SERVER;
 	response->addParameter(c->name);
+	response->addParameter("client timed out");
 	response->buildRawData();
 	server4->addBroadcast(response);
 
@@ -159,7 +160,7 @@ void Thread::processClientMessage(Client* c, Message* msg) {
 }
 
 void Thread::processClientBroadcast(Client* c, Message* msg) {
-  if (msg->type == CLIENT_ADDED || msg->type == NAMECHANGE_FROM_SERVER)
+  if (msg->type == CLIENT_ADDED || msg->type == NAMECHANGE_FROM_SERVER || CLIENT_REMOVED_FROM_SERVER)
     Message::MessageToSocket(socket, msg);
   else if((msg->type == TEXT_FROM_SERVER || msg->type == ACTION_FROM_SERVER) &&
       (msg->words[1].compare(c->changedName) == 0 ||
@@ -313,6 +314,12 @@ void Thread::stop(bool isClient) {
 
 void Thread::determineType() {
   Message* firstMessage = Message::messageFromSocket(socket, true);
+  if (firstMessage == NULL)
+  {
+    cout << "incoming connection with invalid first message, quiting" << endl;
+    stop(false);
+    return;
+  }
   firstMessage->parseData();
   bool registered = false;
 

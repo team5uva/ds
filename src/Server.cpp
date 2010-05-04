@@ -32,9 +32,9 @@ void* Server::parentServerThread(void *_obj) {
 		while (true) {
 		        usleep(100000);
 		        
-		        if (response == NULL)
-			  continue;
 			response = Message::messageFromSocket(&server_socket, true);
+			if (response == NULL)
+			  continue;
 			response->parseData();
 
 			std::cout << "From parent Server Message type: " << response->type << "\n\n";
@@ -97,9 +97,7 @@ void Server::connectToParent(string ownSocketaddress) {
 	this->ownSocketaddress = ownSocketaddress;
 
 	pthread_t server_thread;
-	if (parent) {
-		int error = pthread_create(&server_thread, 0, Server::parentServerThread, this);
-	}
+	int error = pthread_create(&server_thread, 0, Server::parentServerThread, this);
 }
 
 string Server::getIpAddress() {
