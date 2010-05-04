@@ -29,6 +29,8 @@ private:
   void runClient(Client* c);
   void processClientMessage(Client* c, Message* msg);
   void processClientBroadcast(Client* c, Message* msg);
+  void processServerMessage(Server* s, Message* m);
+  void processServerBroadcast(Server* s, Message* m);
   void ping();
 
 public:
