@@ -107,6 +107,9 @@ Message* Server4::addBroadcast(int type, vector<string>* words) {
 }
 
 Message* Server4::getLatestBroadcast() {
+        if (broadcastList.empty())
+	  return NULL;
+
 	Message* result;
 	pthread_mutex_lock(&m_broadcast);
 	result = broadcastList.back();
@@ -120,7 +123,7 @@ void Server4::addServer(Server* server, bool parent) {
 
 	servers.push_back(server);
 
-	if (parent == NULL) {
+	if (parent) {
 		parentServer = server;
 		parentServer->setControlSocket(controlServer_socket);
 		parentServer->connectToParent(address);

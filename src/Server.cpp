@@ -30,6 +30,10 @@ void* Server::parentServerThread(void *_obj) {
 
 		Message* response;
 		while (true) {
+		        usleep(100000);
+		        
+		        if (response == NULL)
+			  continue;
 			response = Message::messageFromSocket(&server_socket, true);
 			response->parseData();
 

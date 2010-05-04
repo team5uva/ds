@@ -61,6 +61,21 @@ void Thread::runClient(Client* c) {
       else if (lastActivityTime + 2 < time(0) && waiting_for_pong)
       {
 	std::cout << "ending connection, no pong in correct time" << std::endl;
+
+
+	Message* response = new Message();
+	response->type = CLIENT_REMOVED_FROM_SERVER;
+	response->addParameter(c->name);
+	response->buildRawData();
+	server4->addBroadcast(response);
+
+	pthread_mutex_lock(&(server4->m_clients));
+	for (int i = 0; i < server4->clients.size(); i++)
+	  if (server4->clients[i] == c)
+	    server4->clients.erase(server4->clients.begin() + i);
+	pthread_mutex_unlock(&(server4->m_clients));
+
+
 	stop(true);
       }
       else
@@ -161,6 +176,8 @@ void Thread::runServer(Server* s) {
     bool sleep;
 
     lastActivityTime = time(0);
+    waiting_for_pong = false;
+   
     cout << "Started server thread." << endl;
     
     //Connected clients given to new server
