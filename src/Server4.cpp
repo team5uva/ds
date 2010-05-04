@@ -132,6 +132,7 @@ void Server4::addServer(Server* server, bool parent) {
 		parentServer = server;
 		parentServer->setControlSocket(controlServer_socket);
 		//parentServer->connectToParent(address);
+		server->ownSocketaddress = address;
 		Thread* t = new Thread();
 		t->start(server, this);
 
