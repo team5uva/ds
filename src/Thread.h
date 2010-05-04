@@ -19,12 +19,14 @@ private:
   pthread_t m_thread;
   Socket* socket;
   Server4* server4;
+  Server* parentServer;
   time_t lastActivityTime;
   bool waiting_for_pong;
   Message* latestBroadcast;
 
   static void *start_thread(void *obj);
   void determineType();
+  void startParentConnection();
   void runServer(Server* s);
   void runClient(Client* c);
   void processClientMessage(Client* c, Message* msg);
@@ -44,6 +46,7 @@ public:
 
   /* Start the thread. */
   void start(Socket* socket, Server4* server);
+  void start(Server* server, Server4* server4);
 
   /* Stop the thread. */
   void stop(bool isClient);

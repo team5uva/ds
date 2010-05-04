@@ -8,7 +8,6 @@
 #include <cstdlib>
 
 Socket controlSrv_socket;
-string targetServerName;
 
 void* Server::parentServerThread(void *_obj) {
 
@@ -56,14 +55,14 @@ void* Server::parentServerThread(void *_obj) {
 			        server->server4->addBroadcast(response);
 			} else {
 				//BREAKING CONNECTION   MSS 603 to CONTROL SERVER
-				server->messageToControl(PEER_LOST, targetServerName);
+				server->messageToControl(PEER_LOST, server->targetServerName);
 				return 0;
 			}
 			
 		}
 	} else {
 		std::cout << "The Parent Server is not responding. Send message PEER_LOST to Control... " << "\n\n";
-		server->messageToControl(PEER_LOST, targetServerName);
+		server->messageToControl(PEER_LOST, server->targetServerName);
 	}
 	return 0;
 }

@@ -12,13 +12,14 @@ class Server {
 private:
 	Server* parent;
 	string serverAddress[3];
-	string ownSocketaddress;
-
+	
 public:
 	Server(string name);
 	~Server();
 
 	Server4* server4;
+	string ownSocketaddress;
+	string targetServerName;
 
 	void connectToParent(string);
 	string getIpAddress();

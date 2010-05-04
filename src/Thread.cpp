@@ -18,7 +18,11 @@ Thread::~Thread() {
 }
 
 void* Thread::start_thread(void *obj) {
-  reinterpret_cast<Thread*> (obj)->determineType();
+  Thread* t = reinterpret_cast<Thread*>(obj);
+  if (t->parentServer == NULL)
+    t->determineType();
+  else
+    t->startParentConnection();
 }
 
 void Thread::runClient(Client* c) {
@@ -291,13 +295,22 @@ void Thread::processServerBroadcast(Server* s, Message* m) {
   }
 }
 
-
+void Thread::start(Server* server, Server4* server4)
+{
+  assert(m_running == false);
+  m_running = true;
+  this->server4 = server4;
+  this->parentServer = server;
+  this->socket = NULL;
+  pthread_create(&m_thread, 0, &Thread::start_thread, this);
+}
 /* Start the thread. */
 void Thread::start(Socket* socket, Server4* server4) {
   assert(m_running == false);
   m_running = true;
   this->socket = socket;
   this->server4 = server4;
+  this->parentServer = NULL;
   pthread_create(&m_thread, 0, &Thread::start_thread, this);
 }
 
@@ -311,7 +324,30 @@ void Thread::stop(bool isClient) {
   cout << "Stopping " << (isClient ? "client" : "server") << " thread." << endl;
   pthread_join(m_thread, 0);
 }
+void Thread::startParentConnection()
+{
+  Server* server = parentServer;
+  std::cout << "Connecting to parent: " << server->getIpAddress() << ":" << server->getPort() << "\n\n";
 
+  Message m;
+  m.type = SERVER_REGISTER;
+  m.addParameter(server->ownSocketaddress);
+  m.buildRawData();
+
+  Socket server_socket;
+
+  if (server_socket.connectTo(server->getIpAddress(), server->getPort()) >= 0) {
+    std::cout << "made connection with parent" << std::endl;
+    Message::MessageToSocket(&server_socket, &m);
+    runServer(server);
+  } else {
+    std::cout << "The Parent Server is not responding. Send message PEER_LOST to Control... " << "\n\n";
+    server->messageToControl(PEER_LOST, server->targetServerName);
+  }
+  return;
+  
+
+}
 void Thread::determineType() {
   Message* firstMessage = Message::messageFromSocket(socket, true);
   if (firstMessage == NULL)
