@@ -190,7 +190,7 @@ void* Server4::controlThread(void *_obj) {
 
 			server4->deleteServer(response->words[0]);
 
-			if (response->words[1] != "none") {
+			if (response->words[1] != "none" || response->words[1] == "") {
 				cout << "Got parent server address: " << response->words[1] << "\n\n";
 
 				//Create parent server
