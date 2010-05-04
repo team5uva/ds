@@ -16,6 +16,9 @@ Message* Message::messageFromSocket(Socket* s, bool blocking)
   if(!blocking && bytesPeeked < 0)
     return NULL;
 
+  if(bytesPeeked == 0)
+    return NULL;
+
   length = htons(length);
   s->readBytes(message, 0, length);
 
