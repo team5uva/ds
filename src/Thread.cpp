@@ -63,26 +63,29 @@ void Thread::runClient(Client* c) {
 	std::cout << "ending connection, no pong in correct time" << std::endl;
 	stop(true);
       }
+      else
+      {
 
 
-      receivedMessage = Message::messageFromSocket(socket, false);
+	receivedMessage = Message::messageFromSocket(socket, false);
 
-      if (receivedMessage != NULL) {
-        cout << "from client: " << c->name << endl;
-        receivedMessage->parseData();
-	cout << "received message with type: " << receivedMessage->getType() << endl;
+	if (receivedMessage != NULL) {
+	  cout << "from client: " << c->name << endl;
+	  receivedMessage->parseData();
+	  cout << "received message with type: " << receivedMessage->getType() << endl;
 
-        processClientMessage(c, receivedMessage);
+	  processClientMessage(c, receivedMessage);
 
-        sleep = false;
-      }
+	  sleep = false;
+	}
 
-      if (latestBroadcast == NULL)
-        latestBroadcast = server4->getLatestBroadcast();
-      else if (latestBroadcast->next != NULL) {
-        latestBroadcast = latestBroadcast->next;
-        processClientBroadcast(c, latestBroadcast);
-        sleep = false;
+	else if (latestBroadcast == NULL)
+	  latestBroadcast = server4->getLatestBroadcast();
+	else if (latestBroadcast->next != NULL) {
+	  latestBroadcast = latestBroadcast->next;
+	  processClientBroadcast(c, latestBroadcast);
+	  sleep = false;
+	}
       }
 
       if (sleep)
