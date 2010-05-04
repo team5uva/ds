@@ -97,7 +97,7 @@ void Server::connectToParent(string ownSocketaddress) {
 	this->ownSocketaddress = ownSocketaddress;
 
 	pthread_t server_thread;
-	if (parent) {
+	if (parent == NULL) {
 		int error = pthread_create(&server_thread, 0, Server::parentServerThread, this);
 	}
 }
