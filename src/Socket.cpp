@@ -34,7 +34,7 @@ Socket::~Socket() {
 
 /* Binds socket to port, returns bound port. Returns -1 on failure. */
 int Socket::bindTo(int port) {
-  int initialPort;
+  int initialPort = port;
   bool bound = false;
 
 	if (sockState != NEW)
