@@ -11,7 +11,8 @@ class MessageTest : public CPPUNIT_NS :: TestFixture
 {
 
     CPPUNIT_TEST_SUITE (MessageTest);
-    CPPUNIT_TEST (ParseMessageTest);
+    CPPUNIT_TEST (LocalParseMessageTest);
+    CPPUNIT_TEST (SocketParseMessageTest);
     CPPUNIT_TEST_SUITE_END ();
 
 
@@ -20,7 +21,8 @@ class MessageTest : public CPPUNIT_NS :: TestFixture
         void tearDown (void);
 
     protected:
-        void ParseMessageTest (void);
+        void LocalParseMessageTest (void);
+        void SocketParseMessageTest (void);
     private:
         Message *a, *b;
 };
