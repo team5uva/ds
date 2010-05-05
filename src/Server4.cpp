@@ -67,8 +67,8 @@ Server4::Server4() {
 		address.append(":");
 		address.append(identificationTag);
 
-		pthread_t controlServer_thread;
-		int error = pthread_create(&controlServer_thread, 0, Server4::controlThread, this);
+		//pthread_t controlServer_thread;
+		//int error = pthread_create(&controlServer_thread, 0, Server4::controlThread, this);
 
 	} else {
 		// Error in configuration file, shut down program
@@ -153,7 +153,6 @@ void Server4::deleteServer(string serverTag) {
 }
 
 void* Server4::controlThread(void *_obj) {
-
 	Server4* server4 = (Server4*) _obj;
 
 	server4->connectToControl(server4);
