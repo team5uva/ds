@@ -4,7 +4,7 @@
 #include <cppunit/TestResultCollector.h>
 #include <cppunit/TestRunner.h>
 #include <cppunit/BriefTestProgressListener.h>
-/*
+
 int main (int argc, char* argv[])
 {
     // informs test-listener about testresults
@@ -29,4 +29,4 @@ int main (int argc, char* argv[])
 
     // return 0 if tests were successful
     return collectedresults.wasSuccessful () ? 0 : 1;
-}*/
+}

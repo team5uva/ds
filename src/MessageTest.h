@@ -1,12 +1,12 @@
-#ifndef FRACTIONTEST_H
-#define FRACTIONTEST_H
+#ifndef MESSAGETEST_H
+#define MESSAGETEST_H
 
 #include <cppunit/TestFixture.h>
 #include <cppunit/extensions/HelperMacros.h>
 #include "Message.h"
 
 using namespace std;
-/*
+
 class MessageTest : public CPPUNIT_NS :: TestFixture
 {
 
@@ -24,5 +24,5 @@ class MessageTest : public CPPUNIT_NS :: TestFixture
     private:
         Message *a, *b;
 };
-*/
+
 #endif
