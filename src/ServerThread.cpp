@@ -148,6 +148,7 @@ void Thread::processServerMessage(Server* s, Message* m) {
 }
 
 void Thread::processServerBroadcast(Server* s, Message* m) {
+  m->buildRawData();
   if(m->type == CLIENT_REMOVED_FROM_SERVER && m->origin != s) {
       Message::MessageToSocket(socket, m);
   } else if(m->type == CLIENT_ADDED && m->origin != s) {
