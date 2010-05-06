@@ -15,7 +15,7 @@ Socket::Socket() {
 	sockfd = socket(PF_INET, SOCK_STREAM, 0);
 	if (sockfd < 0) // did not get valid socket
 	{
-		std::cout << "failed to acquire socket" << std::endl;
+		//std::cout << "failed to acquire socket" << std::endl;
 		exit(0);
 	}
 	sockState = NEW;
@@ -27,7 +27,7 @@ Socket::Socket(int sockfd) {
 }
 
 Socket::~Socket() {
-  cout << "Socket destroyed." << endl;
+  //cout << "Socket destroyed." << endl;
 	shutdown(sockfd, 1);
 	close(sockfd);
 }
@@ -70,7 +70,7 @@ int Socket::connectTo(string host, int port)
 	server = gethostbyname(cstr);
 	if (server == NULL)
   {
-		std::cout << "Error: No such host." << std::endl;
+		//std::cout << "Error: No such host." << std::endl;
 		return -1;
 	}
 	address.sin_family = AF_INET;
@@ -78,7 +78,7 @@ int Socket::connectTo(string host, int port)
 	address.sin_port = htons(port);
 	if (connect(sockfd, (struct sockaddr *) &address, sizeof(address)) < 0)
   {
-		std::cout << "Error: Failed to connect to socket." << std::endl;
+		//std::cout << "Error: Failed to connect to socket." << std::endl;
 		return -1;
 	}
 

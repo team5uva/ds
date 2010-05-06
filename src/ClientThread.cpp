@@ -14,7 +14,7 @@ void Thread::runClient(Client* c) {
     lastActivityTime = time(0);
     waiting_for_pong = false;
 
-    cout << "Started client thread." << endl;
+    server4->logStream << "Started client thread." << endl;
 
     // Send registration success message to connecting client
     response.type = REGISTRATION_SUCCESS;
@@ -44,7 +44,7 @@ void Thread::runClient(Client* c) {
         ping();
       else if (lastActivityTime + 2 < time(0) && waiting_for_pong)
       {
-	std::cout << "ending connection, no pong in correct time" << std::endl;
+	server4->logStream << "ending connection, no pong in correct time" << std::endl;
 
 
 	Message* response = new Message();
@@ -70,9 +70,9 @@ void Thread::runClient(Client* c) {
 	receivedMessage = Message::messageFromSocket(socket, false);
 
 	if (receivedMessage != NULL) {
-	  cout << "from client: " << c->name << endl;
+	  server4->logStream << "from client: " << c->name << endl;
 	  receivedMessage->parseData();
-	  cout << "received message with type: " << receivedMessage->getType() << endl;
+	  server4->logStream << "received message with type: " << receivedMessage->getType() << endl;
 
 	  processClientMessage(c, receivedMessage);
 

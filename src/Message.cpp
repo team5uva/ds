@@ -27,7 +27,7 @@ Message* Message::messageFromSocket(Socket* s, bool blocking)
 
 void Message::MessageToSocket(Socket* s, Message* m)
 {
-  std::cout << "trying to send message of length " << m->length << " and code " << m->type << std::endl;
+  //std::cout << "trying to send message of length " << m->length << " and code " << m->type << std::endl;
   s->writeBytes(m->rawData, m->length);
 }
 

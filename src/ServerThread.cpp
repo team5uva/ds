@@ -14,7 +14,7 @@ void Thread::runServer(Server* s) {
   waiting_for_pong = false;
   latestBroadcast = NULL;
 
-  cout << "Started server thread." << endl;
+  server4->logStream << "Started server thread." << endl;
 
   //Connected clients given to new server
   pthread_mutex_lock(&(server4->m_clients));
@@ -36,7 +36,7 @@ void Thread::runServer(Server* s) {
       ping();
     else if (lastActivityTime + 2 < time(0) && waiting_for_pong)
     {
-      std::cout << "ending connection, no pong in correct time" << std::endl;
+      server4->logStream << "ending connection, no pong in correct time" << std::endl;
       stop(false);
     }
     else
@@ -45,9 +45,9 @@ void Thread::runServer(Server* s) {
       receivedMessage = Message::messageFromSocket(socket, false);
 
       if (receivedMessage != NULL) {
-	cout << "from Server: " << s->getIpAddress();
+	server4->logStream << "from Server: " << s->getIpAddress();
 	receivedMessage->parseData();
-	cout << " received message with type: " << receivedMessage->getType() << endl;
+	server4->logStream << " received message with type: " << receivedMessage->getType() << endl;
 
 	processServerMessage(s, receivedMessage);
 
@@ -62,10 +62,6 @@ void Thread::runServer(Server* s) {
 	  processServerBroadcast(s, latestBroadcast);
       }
       else if (latestBroadcast->next != NULL) {
-	cout << "test" << endl;
-//	processServerBroadcast(s, latestBroadcast);
-        if (latestBroadcast->words.size() > 1)
-	  std::cout << "word in last msg brdcast: " << latestBroadcast->words[0] << std::endl;
 	latestBroadcast = latestBroadcast->next;
 	processServerBroadcast(s, latestBroadcast);
 

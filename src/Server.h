@@ -21,11 +21,9 @@ public:
 	string ownSocketaddress;
 	string targetServerName;
 
-	void connectToParent(string);
 	string getIpAddress();
 	string getTag();
 	int getPort();
-	static void* parentServerThread(void *_obj);
 	void setControlSocket(Socket &socket);
 	void messageToControl(int mssType, string parameter);
 };

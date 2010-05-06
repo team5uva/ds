@@ -41,13 +41,6 @@ Server4::Server4() {
 
 		this->administrators = config.adminAccess;
 
-		// No problems detected in configuration file
-		// Maybe some detection here to check if all variables have indeed been set
-		cout << "No problems detected in configuration file." << endl;
-		for (unsigned int i = 0; i < config.adminAccess.size(); i++) {
-			cout << config.adminAccess.at(i)->name << endl;
-			cout << config.adminAccess.at(i)->password << endl;
-		}
 
 		port = config.getListenPort();
 		identificationTag = config.getTag();
@@ -77,11 +70,16 @@ Server4::Server4() {
 
 		//pthread_t controlServer_thread;
 		//int error = pthread_create(&controlServer_thread, 0, Server4::controlThread, this);
+                
+		// No problems detected in configuration file
+		// Maybe some detection here to check if all variables have indeed been set
+		logStream << "No problems detected in configuration file." << endl;
+
 
 	} else {
 		// Error in configuration file, shut down program
 		// Maybe make a breakdown of different sort of errors to handle it more gracefully
-		cout << "Problem detected in configuration file, shutting down..." << endl;
+		logStream << "Problem detected in configuration file, shutting down..." << endl;
 		exit(0);
 	}
 }
@@ -132,7 +130,7 @@ Message* Server4::getLatestBroadcast() {
 }
 
 void Server4::addServer(Server* server, bool parent) {
-	cout << "Adding server  ..." << "\n";
+	logStream << "Adding server  ..." << "\n";
 
 	servers.push_back(server);
 
@@ -152,7 +150,7 @@ void Server4::deleteServer(string serverTag) {
 	for (unsigned int i = 0; i < servers.size(); i++) {
 		if (servers[i]->getTag() == serverTag) {
 
-			cout << "deleting Server " << serverTag << "\n";
+			logStream << "deleting Server " << serverTag << "\n";
 
 			delete servers[i];
 			servers.erase(servers.begin() + i);
@@ -170,13 +168,13 @@ void* Server4::controlThread(void *_obj) {
 		response = Message::messageFromSocket(&controlServer_socket, true);
 		response->parseData();
 
-		cout << "From Control Server Message type: " << response->type << "\n";
+		server4->logStream << "From Control Server Message type: " << response->type << std::endl;
 
 		// Get adres of the parent server if exists
 		if (response->type == ADDRESS_FROM_CONTROL) {
 
 			if (response->words[0] != "none") {
-				cout << "Got parent server address: " << response->words[0] << "\n\n";
+				server4->logStream << "Got parent server address: " << response->words[0] << std::endl << std::endl;
 
 				//Create parent server
 				Server* server = new Server(response->words[0]);
@@ -184,7 +182,7 @@ void* Server4::controlThread(void *_obj) {
 				server4->addServer(server, true);
 
 			} else {
-				cout << "No parent server exists." "\n\n";
+				server4->logStream << "No parent server exists." << std::endl << std::endl;
 			}
 
 			// PING - PONG control server
@@ -199,12 +197,12 @@ void* Server4::controlThread(void *_obj) {
 		        if (response->words.size() == 1)
 			  response->words.push_back("none");
 
-			cout << "REGROUP: " << response->words[0] << " new parent: " << response->words[1] << "\n\n";
+			server4->logStream << "REGROUP: " << response->words[0] << " new parent: " << response->words[1] << std::endl << std::endl;
 
 			server4->deleteServer(response->words[0]);
 
 			if (response->words[1] != "none" || response->words[1] == "") {
-				cout << "Got parent server address: " << response->words[1] << "\n\n";
+				server4->logStream << "Got parent server address: " << response->words[1] << std::endl << std::endl;
 
 				//Create parent server
 				Server* server = new Server(response->words[1]);
@@ -213,7 +211,7 @@ void* Server4::controlThread(void *_obj) {
 
 		} else {
 			//BREAKING CONNECTION
-			cout << "Lost connection with Control. Reconnecting... " << "\n\n";
+			server4->logStream << "Lost connection with Control. Reconnecting... " << std::endl << std::endl;
 			server4->connectToControl(server4);
 		}
 	}
@@ -227,8 +225,7 @@ void Server4::connectToControl(Server4* server4) {
 
 	m.buildRawData();
 
-	cout << "To Control Server Message: " << m.words[0] << "\n";
-
+	logStream << "To Control Server Message: " << m.words[0] << std::endl;
 	controlServer_socket.connectTo("146.50.1.95", 2001);
 	Message::MessageToSocket(&controlServer_socket, &m);
 

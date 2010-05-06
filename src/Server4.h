@@ -2,7 +2,6 @@
 #define SERVER4_H_
 
 #include "Admin.h"
-#include "Logger.h"
 #include "Client.h"
 #include "Socket.h"
 #include <string>
@@ -26,7 +25,6 @@ public:
 
 	bool connected;
 	Server* parentServer;
-	Logger* logger;
 	pthread_t mainthread;
 
 	vector<Client*> clients;

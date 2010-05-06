@@ -52,13 +52,13 @@ void Thread::stop(bool isClient) {
     ;
   delete socket;
   socket = 0;
-  cout << "Stopping " << (isClient ? "client" : "server") << " thread." << endl;
+  server4->logStream << "Stopping " << (isClient ? "client" : "server") << " thread." << endl;
   pthread_join(m_thread, 0);
 }
 void Thread::startParentConnection()
 {
   Server* server = parentServer;
-  std::cout << "Connecting to parent: " << server->getIpAddress() << ":" << server->getPort() << "\n\n";
+  server4->logStream << "Connecting to parent: " << server->getIpAddress() << ":" << server->getPort() << "\n\n";
 
   Message m;
   m.type = SERVER_REGISTER;
@@ -69,11 +69,11 @@ void Thread::startParentConnection()
   socket = server_socket;
 
   if (server_socket->connectTo(server->getIpAddress(), server->getPort()) >= 0) {
-    std::cout << "made connection with parent" << std::endl;
+    server4->logStream << "made connection with parent" << std::endl;
     Message::MessageToSocket(server_socket, &m);
     runServer(server);
   } else {
-    std::cout << "The Parent Server is not responding. Send message PEER_LOST to Control... " << "\n\n";
+    server4->logStream << "The Parent Server is not responding. Send message PEER_LOST to Control... " << "\n\n";
     server->messageToControl(PEER_LOST, server->targetServerName);
   }
   return;
@@ -84,7 +84,7 @@ void Thread::determineType() {
   Message* firstMessage = Message::messageFromSocket(socket, true);
   if (firstMessage == NULL)
   {
-    cout << "incoming connection with invalid first message, quiting" << endl;
+    server4->logStream << "incoming connection with invalid first message, quiting" << endl;
     stop(false);
     return;
   }
@@ -96,7 +96,6 @@ void Thread::determineType() {
 
     do {
       c->name = c->changedName = firstMessage->words[0];
-      cout << firstMessage->words[0] << endl;
 
       /* If password was included */
       if (firstMessage->words.size() > 1) {
@@ -143,14 +142,14 @@ void Thread::determineType() {
 
     Server* s = new Server(firstMessage->words[0]);
 
-    std::cout << "new Child Server: " << firstMessage->words[0] << "    -  " << firstMessage->words.size() << std::endl;
+    server4->logStream << "new Child Server: " << firstMessage->words[0] << "    -  " << firstMessage->words.size() << std::endl;
     this->server4->addServer(s, false);
 
     //server4->addBroadcast(CLIENT_ADDED, &(firstMessage->words));
     runServer(s);
 
   } else {
-    std::cout << "invalid connection attempt" << std::endl;
+    server4->logStream << "invalid connection attempt" << std::endl;
   }
 }
 
