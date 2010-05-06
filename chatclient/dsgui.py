@@ -380,7 +380,7 @@ def process_network(rsock, condition, control=False):
                     registered = True
                 # Registration failed
                 elif type == 510:
-                    chattext.append("*** Registration failed, type /nick name [password] to retry")
+                    chattext.append("*** Registration failed, type /nick name [password] to retry ("+text+")")
                 # Nickchange successful
                 elif type == 520:
                     gui.get_widget('nickname').set_text(newnick)

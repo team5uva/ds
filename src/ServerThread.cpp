@@ -111,7 +111,7 @@ void Thread::processServerMessage(Server* s, Message* m) {
 
      pthread_mutex_lock(&(server4->m_clients));
      for (int i = 0; i < server4->clients.size(); i++)
-       if (server4->clients[i]->name == m->words[0])
+       if (server4->clients[i]->changedName == m->words[0])
 	 server4->clients.erase(server4->clients.begin() + i);
      pthread_mutex_unlock(&(server4->m_clients));
      response->type = CLIENT_REMOVED_FROM_SERVER;

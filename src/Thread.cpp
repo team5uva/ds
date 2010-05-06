@@ -122,12 +122,31 @@ void Thread::determineType() {
       {
         c->isAdmin = false;
         registered = true;
+
+	for (int i = 0; i < server4->clients.size(); i++)
+	  if (server4->clients[i]->changedName.compare(c->name) == 0)
+	    registered = false;
+
+	if (!registered)
+	{
+          Message response;
+          response.type = REGISTRATION_FAIL;
+          response.addParameter("Username already in use on server.");
+          response.buildRawData();
+          Message::MessageToSocket(socket, &response);
+	}
       }
 
       if(!registered) {
         delete firstMessage;
         firstMessage = 0;
         firstMessage = Message::messageFromSocket(socket, true);
+	if (firstMessage == NULL)
+	{
+	  server4->logStream << "incoming connection with invalid first message, quiting" << endl;
+	  stop(false);
+	  return;
+	}
         firstMessage->parseData();
       }
     } while(!registered);
