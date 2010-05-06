@@ -58,8 +58,8 @@ void Thread::runServer(Server* s) {
       else if (latestBroadcast == NULL)
 	latestBroadcast = server4->getLatestBroadcast();
       else if (latestBroadcast->next != NULL) {
-	latestBroadcast = latestBroadcast->next;
 	processServerBroadcast(s, latestBroadcast);
+	latestBroadcast = latestBroadcast->next;
 	sleep = false;
       }
     }
