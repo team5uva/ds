@@ -47,8 +47,9 @@ void Thread::start(Socket* socket, Server4* server4) {
 /* Stop the thread. */
 void Thread::stop(bool isClient) {
   assert(m_running == true);
-  m_running = false;
   m_stoprequested = true;
+  while (m_running)
+    ;
   delete socket;
   socket = 0;
   cout << "Stopping " << (isClient ? "client" : "server") << " thread." << endl;
@@ -64,12 +65,12 @@ void Thread::startParentConnection()
   m.addParameter(server->ownSocketaddress);
   m.buildRawData();
 
-  Socket server_socket;
-  socket = & server_socket;
+  Socket* server_socket = new Socket();
+  socket = server_socket;
 
-  if (server_socket.connectTo(server->getIpAddress(), server->getPort()) >= 0) {
+  if (server_socket->connectTo(server->getIpAddress(), server->getPort()) >= 0) {
     std::cout << "made connection with parent" << std::endl;
-    Message::MessageToSocket(&server_socket, &m);
+    Message::MessageToSocket(server_socket, &m);
     runServer(server);
   } else {
     std::cout << "The Parent Server is not responding. Send message PEER_LOST to Control... " << "\n\n";

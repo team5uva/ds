@@ -78,6 +78,7 @@ void Thread::runServer(Server* s) {
     else
       lastActivityTime = time(0);
   }
+  m_running = false;
 }
 
 void Thread::processServerMessage(Server* s, Message* m) {
@@ -161,5 +162,4 @@ void Thread::processServerBroadcast(Server* s, Message* m) {
       Message::MessageToSocket(socket, m);
   }
 }
-
 

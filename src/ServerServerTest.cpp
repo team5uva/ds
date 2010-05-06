@@ -89,6 +89,10 @@ void ServerServerTest :: transmissionTest (void)
       }
     }
 
+    threadB->stop(false);
+    threadA->stop(false);
+    
+
 
 
     CPPUNIT_ASSERT_EQUAL ((int)a->clients.size(), (int)b->clients.size());

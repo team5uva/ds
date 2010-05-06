@@ -93,6 +93,7 @@ void Thread::runClient(Client* c) {
       else
         lastActivityTime = time(0);
     }
+    m_running = false;
 }
 
 void Thread::processClientMessage(Client* c, Message* msg) {
