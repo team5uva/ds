@@ -12,6 +12,7 @@ void Thread::runServer(Server* s) {
 
   lastActivityTime = time(0);
   waiting_for_pong = false;
+  latestBroadcast = server4->getLatestBroadcast();
 
   cout << "Started server thread." << endl;
 
