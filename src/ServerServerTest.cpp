@@ -12,7 +12,10 @@ void ServerServerTest :: setUp (void)
 {
     // set up test environment (initializing objects)
     a = new Server4();
+    a->logStream.open("testlog1.log", std::fstream::in | std::fstream::out | std::fstream::app);
     b = new Server4();
+    b->logStream.open("testlog2.log", std::fstream::in | std::fstream::out | std::fstream::app);
+
 
     Client* bert = new Client();
     bert->name = "bert";
