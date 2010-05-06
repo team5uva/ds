@@ -113,11 +113,11 @@ void Thread::processServerMessage(Server* s, Message* m) {
      server4->addBroadcast(response);
    } else if (m->type == CLIENT_REMOVED_FROM_SERVER) {
 
-       pthread_mutex_lock(&(server4->m_clients));
-       for (int i = 0; i < server4->clients.size(); i++)
-	 if (server4->clients[i]->name == m->words[0])
-	   server4->clients.erase(server4->clients.begin() + i);
-       pthread_mutex_unlock(&(server4->m_clients));
+     pthread_mutex_lock(&(server4->m_clients));
+     for (int i = 0; i < server4->clients.size(); i++)
+       if (server4->clients[i]->name == m->words[0])
+	 server4->clients.erase(server4->clients.begin() + i);
+     pthread_mutex_unlock(&(server4->m_clients));
      response->type = CLIENT_REMOVED_FROM_SERVER;
      response->words = m->words;
      response->origin = s;

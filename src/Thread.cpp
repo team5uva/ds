@@ -48,7 +48,7 @@ void Thread::start(Socket* socket, Server4* server4) {
 void Thread::stop(bool isClient) {
   assert(m_running == true);
   m_stoprequested = true;
-  while (m_running)
+  while (m_running && !isClient)
     ;
   delete socket;
   socket = 0;
