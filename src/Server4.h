@@ -8,6 +8,7 @@
 #include <string>
 #include <assert.h>
 #include <pthread.h>
+#include <fstream>
 #include <vector>
 
 using namespace std;
@@ -33,6 +34,8 @@ public:
 	vector<Message*> broadcastList;
 	pthread_mutex_t m_broadcast, m_clients;
 	Socket* listenSocket;
+
+	std::fstream logStream;
 
 	enum STATUS {
 		ADMIN = 0, REGULAR = 1

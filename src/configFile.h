@@ -16,11 +16,13 @@ public:
     };
     string path;
     int listenPort, CSPort;
+    bool perIpLog;
     string CSAddress, Tag;
     vector<Admin*> adminAccess;
 
     configFile() {
         path = "config.cfg";
+	perIpLog = false;
     }
 
     configFile(string path) {
@@ -33,6 +35,7 @@ public:
     int getCSPort();
     string getCSAddress();
     string getTag();
+    bool getPerIpLog();
     vector<Admin*> getAdmin();
 };
 #endif /* PARSECONFIG_H_ */

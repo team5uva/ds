@@ -15,6 +15,7 @@ string arg_CSAddress = ("CSAddress ");
 string arg_CSPort = ("CSPort ");
 string arg_listenPort = ("listenPort ");
 string arg_Tag = ("Tag ");
+string arg_IPlog = ("IPlogging");
 
 size_t found;
 
@@ -26,6 +27,8 @@ configFile::ERROR_CODE configFile::parseFile() {
     if (cfgFile.is_open()) {
         while (!cfgFile.eof()) {
             getline(cfgFile, line);
+	    if (line.size() == 0)
+	      continue;
             if (line.at(0) == arg_Comment.at(0)) {
                 /* Comment in config file, skipping line. */
             } else if (line.at(0) == arg_Admin.at(0)) {
@@ -56,6 +59,10 @@ configFile::ERROR_CODE configFile::parseFile() {
                 if (found = line.find(arg_Tag) != string::npos) {
                     Tag = line.substr(found + (arg_Tag.length() - 1));
                 }
+                if (found = line.find(arg_IPlog) != string::npos) {
+                    perIpLog = true;
+                }
+
             }
         }
         cfgFile.close();
@@ -90,4 +97,9 @@ string configFile::getTag() {
 
 vector<Admin*> configFile::getAdmin() {
     return adminAccess;
+}
+
+bool configFile::getPerIpLog()
+{
+  return perIpLog;
 }

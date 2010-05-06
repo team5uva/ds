@@ -64,6 +64,14 @@ Server4::Server4() {
 		stringstream out;
 		out << port;
 		address.append(out.str());
+		string logfile = "logfile.";
+		if (config.getPerIpLog())
+		{
+		  logfile.append(address);
+		  logfile.append(".");
+		}
+		logfile.append("log");
+		logStream.open(logfile.c_str(), std::fstream::in | std::fstream::out | std::fstream::app);
 		address.append(":");
 		address.append(identificationTag);
 
