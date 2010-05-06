@@ -37,6 +37,22 @@ void Thread::runServer(Server* s) {
     else if (lastActivityTime + 2 < time(0) && waiting_for_pong)
     {
       server4->logStream << "ending connection, no pong in correct time" << std::endl;
+      pthread_mutex_lock(&(server4->m_clients));
+      for (int i = 0; i < server4->clients.size(); i++) {
+	if (server4->clients[i]->parent == s)
+	{
+	  Message* response = new Message();
+	  response->type = CLIENT_REMOVED_FROM_SERVER;
+	  response->addParameter(server4->clients[i]->changedName);
+	  response->origin = s;
+	  server4->addBroadcast(response);
+	  server4->clients.erase(server4->clients.begin() + i);
+	}
+	Message::MessageToSocket(socket, &clientNameMsg);
+      }
+      pthread_mutex_unlock(&(server4->m_clients));
+
+
       stop(false);
     }
     else
