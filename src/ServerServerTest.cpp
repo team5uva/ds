@@ -3,6 +3,7 @@
 #include "ServerServerTest.h"
 #include "Thread.h"
 #include "MessageType.h"
+#include "Message.h"
 #include "Server.h"
 
 CPPUNIT_TEST_SUITE_REGISTRATION (ServerServerTest);
@@ -50,25 +51,47 @@ void ServerServerTest :: transmissionTest (void)
 
     Server serverAinB(addressA);
     serverAinB.server4 = b;
-    serverAinB.connectToParent(addressB);
+    threadB->start(&serverAinB, b);
+
 
     Socket* socketA = listenSocket->acceptConn();
     threadA->start(socketA, a);
+
+    usleep(2 * 1000000);
+
+    Client* kermit = new Client();
+    kermit->name = "kermit";
+    Message* kermitMsg = new Message();
+    kermitMsg->type = CLIENT_ADDED;
+    kermitMsg->addParameter("kermit");
+    kermitMsg->buildRawData();
+    Client* cookiemonster = new Client();
+    cookiemonster->name = "cookiemonster";
+    Message cookiemonsterMsg;
+    cookiemonsterMsg.type = CLIENT_ADDED;
+    cookiemonsterMsg.addParameter("cookiemonster");
+    cookiemonsterMsg.buildRawData();
+    a->addClient(kermit);
+    a->addBroadcast(kermitMsg);
+    b->addClient(cookiemonster);
+    b->addBroadcast(&cookiemonsterMsg);
+
+    usleep(2 * 1000000);
+
 
     int matches = 0;
     for (int i = 0; i < a->clients.size(); i++)
     {
       for (int j = 0; j < b->clients.size(); j++)
       {
-	if (a->clients[i] == b->clients[j])
+	if (a->clients[i]->name == b->clients[j]->name)
 	  matches++;
       }
     }
 
-    usleep(30 * 1000000);
 
+
+    CPPUNIT_ASSERT_EQUAL ((int)a->clients.size(), (int)b->clients.size());
     CPPUNIT_ASSERT_EQUAL (matches, (int)a->clients.size());
-    CPPUNIT_ASSERT_EQUAL (matches, (int)b->clients.size());
-
 }
 
