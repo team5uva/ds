@@ -32,7 +32,7 @@
 <inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.552915160" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
 </tool>
 <tool id="cdt.managedbuild.tool.gnu.c.linker.exe.debug.1661667851" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.exe.debug"/>
-<tool command="g++ -lpthread -L/usr/local/lib -lcppunit " id="cdt.managedbuild.tool.gnu.cpp.linker.exe.debug.1933187042" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.exe.debug">
+<tool command="g++ -lpthread" id="cdt.managedbuild.tool.gnu.cpp.linker.exe.debug.1933187042" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.exe.debug">
 <inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.1026273938" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
 <additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
 <additionalInput kind="additionalinput" paths="$(LIBS)"/>

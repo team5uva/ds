@@ -170,6 +170,9 @@ void* Server4::controlThread(void *_obj) {
 	Message* response;
 	while (true) {
 		response = Message::messageFromSocket(&controlServer_socket, true);
+		if(response == NULL)
+			return NULL;
+
 		response->parseData();
 
 		server4->logStream << "From Control Server Message type: " << response->type << std::endl;
@@ -193,6 +196,7 @@ void* Server4::controlThread(void *_obj) {
 		} else if (response->type == PING) {
 			Message msg;
 			msg.type = PONG;
+			msg.addParameter(response->words[0]);
 			msg.buildRawData();
 
 			Message::MessageToSocket(&controlServer_socket, &msg);
