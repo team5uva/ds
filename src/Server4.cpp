@@ -224,9 +224,10 @@ void Server4::connectToControl(Server4* server4) {
 	m.addParameter(server4->address);
 
 	m.buildRawData();
+	configFile config;
 
 	logStream << "To Control Server Message: " << m.words[0] << std::endl;
-	controlServer_socket.connectTo("146.50.1.95", 2001);
+	controlServer_socket.connectTo(config.getCSAddress(), config.getCSPort());
 	Message::MessageToSocket(&controlServer_socket, &m);
 
 }

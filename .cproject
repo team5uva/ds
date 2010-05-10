@@ -21,7 +21,7 @@
 <targetPlatform id="cdt.managedbuild.target.gnu.platform.exe.debug.1255764149" name="Debug Platform" superClass="cdt.managedbuild.target.gnu.platform.exe.debug"/>
 <builder buildPath="${workspace_loc:/Server4/Debug}" id="cdt.managedbuild.target.gnu.builder.exe.debug.848532587" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="Gnu Make Builder" superClass="cdt.managedbuild.target.gnu.builder.exe.debug"/>
 <tool id="cdt.managedbuild.tool.gnu.archiver.base.302244880" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.base"/>
-<tool command="g++ -lpthread" id="cdt.managedbuild.tool.gnu.cpp.compiler.exe.debug.1093710537" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.exe.debug">
+<tool command="g++ -lpthread " id="cdt.managedbuild.tool.gnu.cpp.compiler.exe.debug.1093710537" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.exe.debug">
 <option id="gnu.cpp.compiler.exe.debug.option.optimization.level.278602807" name="Optimization Level" superClass="gnu.cpp.compiler.exe.debug.option.optimization.level" value="gnu.cpp.compiler.optimization.level.none" valueType="enumerated"/>
 <option id="gnu.cpp.compiler.exe.debug.option.debugging.level.1371247815" name="Debug Level" superClass="gnu.cpp.compiler.exe.debug.option.debugging.level" value="gnu.cpp.compiler.debugging.level.max" valueType="enumerated"/>
 <inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.1759700091" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
@@ -32,7 +32,7 @@
 <inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.552915160" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
 </tool>
 <tool id="cdt.managedbuild.tool.gnu.c.linker.exe.debug.1661667851" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.exe.debug"/>
-<tool command="g++ -lpthread" id="cdt.managedbuild.tool.gnu.cpp.linker.exe.debug.1933187042" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.exe.debug">
+<tool command="g++ -lpthread -L/usr/local/lib -lcppunit " id="cdt.managedbuild.tool.gnu.cpp.linker.exe.debug.1933187042" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.exe.debug">
 <inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.1026273938" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
 <additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
 <additionalInput kind="additionalinput" paths="$(LIBS)"/>
