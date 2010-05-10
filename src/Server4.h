@@ -4,6 +4,7 @@
 #include "Admin.h"
 #include "Client.h"
 #include "Socket.h"
+#include "configFile.h"
 #include <string>
 #include <assert.h>
 #include <pthread.h>
@@ -17,6 +18,8 @@ class Server4 {
 public:
 
 	// loaded from configuration file
+        configFile config;
+
 	int port;
 	string controlServerAddress;
 	string identificationTag;

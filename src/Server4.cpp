@@ -32,7 +32,6 @@ Socket controlServer_socket;
 
 Server4::Server4() {
 
-	configFile config;
 
 	// Read configuration file
 	if (config.parseFile() == configFile::SUCCESS) {
@@ -229,10 +228,9 @@ void Server4::connectToControl(Server4* server4) {
 	m.addParameter(server4->address);
 
 	m.buildRawData();
-	configFile config;
 
 	logStream << "To Control Server Message: " << m.words[0] << std::endl;
-	controlServer_socket.connectTo(config.getCSAddress(), config.getCSPort());
+	controlServer_socket.connectTo(server4->config.getCSAddress(), server4->config.getCSPort());
 	Message::MessageToSocket(&controlServer_socket, &m);
 
 }
