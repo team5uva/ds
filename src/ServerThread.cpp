@@ -117,7 +117,10 @@ void Thread::processServerMessage(Server* s, Message* m) {
     pthread_mutex_lock(&(server4->m_clients));
     for (int i = 0; i < server4->clients.size(); i++)
       if (server4->clients[i]->changedName == c->name)
+      {
+	pthread_mutex_unlock(&(server4->m_clients));
         return;
+      }
     pthread_mutex_unlock(&(server4->m_clients));
 
     this->server4->addClient(c);
