@@ -46,8 +46,13 @@ Server4::Server4() {
 		identificationTag = config.getTag();
 		std::ostringstream oss;
 		srandom(time(0));
-		oss << (random()%1000000000);
+		int extraBytes = 32 - identificationTag.length();
+		for (int i = 0; i < extraBytes; i++)
+		{
+		  oss << (random()%10);
+		}
 		identificationTag.append(oss.str());
+
 		char buf[100];
 		gethostname(buf, 100);
 		struct hostent *host_entry;
