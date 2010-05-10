@@ -25,9 +25,9 @@ void Thread::runClient(Client* c) {
   processClientBroadcast(c, latestBroadcast);
 
   // Send all other client names to connecting client
-  Message clientNameMsg;
   pthread_mutex_lock(&(server4->m_clients));
   for (int i = 0; i < server4->clients.size(); i++) {
+    Message clientNameMsg;
     if (server4->clients[i] == c)
       continue;
     clientNameMsg.type = CLIENT_ADDED;
@@ -36,11 +36,6 @@ void Thread::runClient(Client* c) {
     Message::MessageToSocket(socket, &clientNameMsg);
   }
   pthread_mutex_unlock(&(server4->m_clients));
-
-  clientNameMsg.type = CLIENT_ADDED;
-  clientNameMsg.addParameter("#all");
-  clientNameMsg.buildRawData();
-  Message::MessageToSocket(socket, &clientNameMsg);
 
   while (!m_stoprequested) {
     sleep = true;
