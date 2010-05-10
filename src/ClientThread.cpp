@@ -141,6 +141,7 @@ void Thread::processClientMessage(Client* c, Message* msg) {
 }
 
 void Thread::processClientBroadcast(Client* c, Message* msg) {
+  msg->parseData();
   msg->buildRawData();
   if (msg->type == CLIENT_ADDED || msg->type == NAMECHANGE_FROM_SERVER || CLIENT_REMOVED_FROM_SERVER)
     Message::MessageToSocket(socket, msg);
