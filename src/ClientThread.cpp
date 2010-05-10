@@ -7,93 +7,94 @@
 
 void Thread::runClient(Client* c) {
 
-    Message* receivedMessage;
-    Message response;
-    bool sleep;
+  Message* receivedMessage;
+  Message response;
+  bool sleep;
 
-    lastActivityTime = time(0);
-    waiting_for_pong = false;
+  lastActivityTime = time(0);
+  waiting_for_pong = false;
 
-    server4->logStream << "Started client thread." << endl;
+  server4->logStream << "Started client thread." << endl;
 
-    // Send registration success message to connecting client
-    response.type = REGISTRATION_SUCCESS;
-    response.buildRawData();
-    Message::MessageToSocket(socket, &response);
+  // Send registration success message to connecting client
+  response.type = REGISTRATION_SUCCESS;
+  response.buildRawData();
+  Message::MessageToSocket(socket, &response);
 
-    /* Send client name to client. */
-    processClientBroadcast(c, latestBroadcast);
+  /* Send client name to client. */
+  processClientBroadcast(c, latestBroadcast);
 
-    // Send all other client names to connecting client
-    pthread_mutex_lock(&(server4->m_clients));
-    for (int i = 0; i < server4->clients.size(); i++) {
-      if (server4->clients[i] == c)
-        continue;
-      Message clientNameMsg;
-      clientNameMsg.type = CLIENT_ADDED;
-      clientNameMsg.addParameter(server4->clients[i]->name);
-      clientNameMsg.buildRawData();
-      Message::MessageToSocket(socket, &clientNameMsg);
-    }
-    pthread_mutex_unlock(&(server4->m_clients));
+  // Send all other client names to connecting client
+  Message clientNameMsg;
+  pthread_mutex_lock(&(server4->m_clients));
+  for (int i = 0; i < server4->clients.size(); i++) {
+    if (server4->clients[i] == c)
+      continue;
+    clientNameMsg.type = CLIENT_ADDED;
+    clientNameMsg.addParameter(server4->clients[i]->name);
+    clientNameMsg.buildRawData();
+    Message::MessageToSocket(socket, &clientNameMsg);
+  }
+  pthread_mutex_unlock(&(server4->m_clients));
 
-    while (!m_stoprequested) {
-      sleep = true;
+  clientNameMsg.type = CLIENT_ADDED;
+  clientNameMsg.addParameter("#all");
+  clientNameMsg.buildRawData();
+  Message::MessageToSocket(socket, &clientNameMsg);
 
-      if (lastActivityTime + 10 < time(0) && !waiting_for_pong)
-        ping();
-      else if (lastActivityTime + 2 < time(0) && waiting_for_pong)
-      {
-	server4->logStream << "ending connection, no pong in correct time" << std::endl;
+  while (!m_stoprequested) {
+    sleep = true;
 
-
-	Message* response = new Message();
-	response->type = CLIENT_REMOVED_FROM_SERVER;
-	response->addParameter(c->name);
-	response->addParameter("client timed out");
-	response->buildRawData();
-	server4->addBroadcast(response);
-
-	pthread_mutex_lock(&(server4->m_clients));
-	for (int i = 0; i < server4->clients.size(); i++)
-	  if (server4->clients[i] == c)
-	    server4->clients.erase(server4->clients.begin() + i);
-	pthread_mutex_unlock(&(server4->m_clients));
+    if (lastActivityTime + 10 < time(0) && !waiting_for_pong)
+      ping();
+    else if (lastActivityTime + 2 < time(0) && waiting_for_pong) {
+      server4->logStream << "ending connection, no pong in correct time" << std::endl;
 
 
-	stop(true);
+      Message* response = new Message();
+      response->type = CLIENT_REMOVED_FROM_SERVER;
+      response->addParameter(c->name);
+      response->addParameter("client timed out");
+      response->buildRawData();
+      server4->addBroadcast(response);
+
+      pthread_mutex_lock(&(server4->m_clients));
+      for (int i = 0; i < server4->clients.size(); i++)
+        if (server4->clients[i] == c)
+          server4->clients.erase(server4->clients.begin() + i);
+      pthread_mutex_unlock(&(server4->m_clients));
+
+
+      stop(true);
+    } else {
+
+
+      receivedMessage = Message::messageFromSocket(socket, false);
+
+      if (receivedMessage != NULL) {
+        server4->logStream << "from client: " << c->name << endl;
+        receivedMessage->parseData();
+        server4->logStream << "received message with type: " << receivedMessage->getType() << endl;
+
+        processClientMessage(c, receivedMessage);
+
+        sleep = false;
       }
-      else
-      {
-
-
-	receivedMessage = Message::messageFromSocket(socket, false);
-
-	if (receivedMessage != NULL) {
-	  server4->logStream << "from client: " << c->name << endl;
-	  receivedMessage->parseData();
-	  server4->logStream << "received message with type: " << receivedMessage->getType() << endl;
-
-	  processClientMessage(c, receivedMessage);
-
-	  sleep = false;
-	}
-
-	else if (latestBroadcast == NULL)
-	  latestBroadcast = server4->getLatestBroadcast();
-	else if (latestBroadcast->next != NULL) {
-	  latestBroadcast = latestBroadcast->next;
-	  processClientBroadcast(c, latestBroadcast);
-	  sleep = false;
-	}
+      else if (latestBroadcast == NULL)
+        latestBroadcast = server4->getLatestBroadcast();
+      else if (latestBroadcast->next != NULL) {
+        latestBroadcast = latestBroadcast->next;
+        processClientBroadcast(c, latestBroadcast);
+        sleep = false;
       }
-
-      if (sleep)
-        usleep(50000);
-      else
-        lastActivityTime = time(0);
     }
-    m_running = false;
+
+    if (sleep)
+      usleep(50000);
+    else
+      lastActivityTime = time(0);
+  }
+  m_running = false;
 }
 
 void Thread::processClientMessage(Client* c, Message* msg) {
@@ -148,7 +149,7 @@ void Thread::processClientBroadcast(Client* c, Message* msg) {
   msg->buildRawData();
   if (msg->type == CLIENT_ADDED || msg->type == NAMECHANGE_FROM_SERVER || CLIENT_REMOVED_FROM_SERVER)
     Message::MessageToSocket(socket, msg);
-  else if((msg->type == TEXT_FROM_SERVER || msg->type == ACTION_FROM_SERVER) &&
+  else if ((msg->type == TEXT_FROM_SERVER || msg->type == ACTION_FROM_SERVER) &&
       (msg->words[1].compare(c->changedName) == 0 ||
       msg->words[0].compare(c->changedName) == 0 ||
       msg->words[1].compare("#all") == 0))

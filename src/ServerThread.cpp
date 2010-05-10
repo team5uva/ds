@@ -28,60 +28,52 @@ void Thread::runServer(Server* s) {
   pthread_mutex_unlock(&(server4->m_clients));
 
   //Connected servers to new server
-  while (!m_stoprequested)
-  {
+  while (!m_stoprequested) {
     sleep = true;
 
     if (lastActivityTime + 10 < time(0) && !waiting_for_pong)
       ping();
-    else if (lastActivityTime + 2 < time(0) && waiting_for_pong)
-    {
+    else if (lastActivityTime + 2 < time(0) && waiting_for_pong) {
       server4->logStream << "ending connection, no pong in correct time" << std::endl;
       pthread_mutex_lock(&(server4->m_clients));
       for (int i = 0; i < server4->clients.size(); i++) {
-	if (server4->clients[i]->parent == s)
-	{
-	  Message* response = new Message();
-	  response->type = CLIENT_REMOVED_FROM_SERVER;
-	  response->addParameter(server4->clients[i]->changedName);
-	  response->origin = s;
-	  server4->addBroadcast(response);
-	  server4->clients.erase(server4->clients.begin() + i);
-	}
-	Message::MessageToSocket(socket, &clientNameMsg);
+        if (server4->clients[i]->parentServer == s) {
+          Message* response = new Message();
+          response->type = CLIENT_REMOVED_FROM_SERVER;
+          response->addParameter(server4->clients[i]->changedName);
+          response->origin = s;
+          server4->addBroadcast(response);
+          server4->clients.erase(server4->clients.begin() + i);
+        }
+        //Message::MessageToSocket(socket, &clientNameMsg);
       }
       pthread_mutex_unlock(&(server4->m_clients));
 
 
       stop(false);
-    }
-    else
-    {
+    } else {
       //ProcessServerMessage
       receivedMessage = Message::messageFromSocket(socket, false);
 
       if (receivedMessage != NULL) {
-	server4->logStream << "from Server: " << s->getIpAddress();
-	receivedMessage->parseData();
-	server4->logStream << " received message with type: " << receivedMessage->getType() << endl;
+        server4->logStream << "from Server: " << s->getIpAddress();
+        receivedMessage->parseData();
+        server4->logStream << " received message with type: " << receivedMessage->getType() << endl;
 
-	processServerMessage(s, receivedMessage);
+        processServerMessage(s, receivedMessage);
 
-	sleep = false;
+        sleep = false;
       }
+        //ProcessServer Broadcas
+      else if (latestBroadcast == NULL) {
+        latestBroadcast = server4->getLatestBroadcast();
+        if (latestBroadcast != NULL)
+          processServerBroadcast(s, latestBroadcast);
+      } else if (latestBroadcast->next != NULL) {
+        latestBroadcast = latestBroadcast->next;
+        processServerBroadcast(s, latestBroadcast);
 
-      //ProcessServer Broadcas
-      else if (latestBroadcast == NULL)
-      {
-	latestBroadcast = server4->getLatestBroadcast();
-	if (latestBroadcast != NULL)
-	  processServerBroadcast(s, latestBroadcast);
-      }
-      else if (latestBroadcast->next != NULL) {
-	latestBroadcast = latestBroadcast->next;
-	processServerBroadcast(s, latestBroadcast);
-
-	sleep = false;
+        sleep = false;
       }
     }
 
@@ -104,75 +96,75 @@ void Thread::processServerMessage(Server* s, Message* m) {
      170 - NAMECHANGE_SERVER
      600 - SERVER_REGISTER
    */
-   Message* response = new Message();
-   
-   if(m->type == PING) {
-     response->type = PONG;
-     response->addParameter(m->words.at(0));
-     response->buildRawData();
-     Message::MessageToSocket(socket, response);
-   } else if (m->type == PONG) {
-     waiting_for_pong = false;
-   } else if (m->type == CLIENT_ADDED) {
-     Client* c = new Client();
-     c->name = c->changedName = m->words[0];
-     c->isAdmin = false;
-     c->parentServer = s;
-     response->type = CLIENT_ADDED;
-     response->words = m->words;
-     response->origin = s;
-     this->server4->addClient(c);
-     server4->addBroadcast(response);
-   } else if (m->type == CLIENT_REMOVED_FROM_SERVER) {
+  Message* response = new Message();
 
-     pthread_mutex_lock(&(server4->m_clients));
-     for (int i = 0; i < server4->clients.size(); i++)
-       if (server4->clients[i]->changedName == m->words[0])
-	 server4->clients.erase(server4->clients.begin() + i);
-     pthread_mutex_unlock(&(server4->m_clients));
-     response->type = CLIENT_REMOVED_FROM_SERVER;
-     response->words = m->words;
-     response->origin = s;
-      
-     server4->addBroadcast(response);
+  if (m->type == PING) {
+    response->type = PONG;
+    response->addParameter(m->words.at(0));
+    response->buildRawData();
+    Message::MessageToSocket(socket, response);
+  } else if (m->type == PONG) {
+    waiting_for_pong = false;
+  } else if (m->type == CLIENT_ADDED) {
+    Client* c = new Client();
+    c->name = c->changedName = m->words[0];
+    c->isAdmin = false;
+    c->parentServer = s;
+    response->type = CLIENT_ADDED;
+    response->words = m->words;
+    response->origin = s;
+    this->server4->addClient(c);
+    server4->addBroadcast(response);
+  } else if (m->type == CLIENT_REMOVED_FROM_SERVER) {
 
-   } else if(m->type == TEXT_FROM_SERVER) { 
-     response->type = TEXT_FROM_SERVER;
-     response->words = m->words;
-     response->origin = s;
-     server4->addBroadcast(response);
-   } else if(m->type == ACTION_FROM_SERVER) {
-     response->type = ACTION_FROM_SERVER;
-     response->words = m->words;
-     response->origin = s;
-     server4->addBroadcast(response);
-   } else if(m->type == NAMECHANGE_FROM_SERVER) {
-     response->type = NAMECHANGE_FROM_SERVER;
-     response->words = m->words;
-     response->origin = s;
-     server4->addBroadcast(response);
-   } else if(m->type == SERVER_REGISTER) {
-     response->type = SERVER_REGISTER;
-     response->words = m->words;
-     response->origin = s;
-     server4->addBroadcast(response); 
-   }
+    pthread_mutex_lock(&(server4->m_clients));
+    for (int i = 0; i < server4->clients.size(); i++)
+      if (server4->clients[i]->changedName == m->words[0])
+        server4->clients.erase(server4->clients.begin() + i);
+    pthread_mutex_unlock(&(server4->m_clients));
+    response->type = CLIENT_REMOVED_FROM_SERVER;
+    response->words = m->words;
+    response->origin = s;
+
+    server4->addBroadcast(response);
+
+  } else if (m->type == TEXT_FROM_SERVER) {
+    response->type = TEXT_FROM_SERVER;
+    response->words = m->words;
+    response->origin = s;
+    server4->addBroadcast(response);
+  } else if (m->type == ACTION_FROM_SERVER) {
+    response->type = ACTION_FROM_SERVER;
+    response->words = m->words;
+    response->origin = s;
+    server4->addBroadcast(response);
+  } else if (m->type == NAMECHANGE_FROM_SERVER) {
+    response->type = NAMECHANGE_FROM_SERVER;
+    response->words = m->words;
+    response->origin = s;
+    server4->addBroadcast(response);
+  } else if (m->type == SERVER_REGISTER) {
+    response->type = SERVER_REGISTER;
+    response->words = m->words;
+    response->origin = s;
+    server4->addBroadcast(response);
+  }
 }
 
 void Thread::processServerBroadcast(Server* s, Message* m) {
   m->buildRawData();
-  if(m->type == CLIENT_REMOVED_FROM_SERVER && m->origin != s) {
-      Message::MessageToSocket(socket, m);
-  } else if(m->type == CLIENT_ADDED && m->origin != s) {
-      Message::MessageToSocket(socket, m);
-  } else if(m->type == TEXT_FROM_SERVER && m->origin != s) {
-      Message::MessageToSocket(socket, m);
-  } else if(m->type == ACTION_FROM_SERVER && m->origin != s) {
-      Message::MessageToSocket(socket, m);
-  } else if(m->type == NAMECHANGE_FROM_SERVER && m->origin != s) {
-      Message::MessageToSocket(socket, m);
-  } else if(m->type == SERVER_REGISTER && m->origin != s) {
-      Message::MessageToSocket(socket, m);
+  if (m->type == CLIENT_REMOVED_FROM_SERVER && m->origin != s) {
+    Message::MessageToSocket(socket, m);
+  } else if (m->type == CLIENT_ADDED && m->origin != s) {
+    Message::MessageToSocket(socket, m);
+  } else if (m->type == TEXT_FROM_SERVER && m->origin != s) {
+    Message::MessageToSocket(socket, m);
+  } else if (m->type == ACTION_FROM_SERVER && m->origin != s) {
+    Message::MessageToSocket(socket, m);
+  } else if (m->type == NAMECHANGE_FROM_SERVER && m->origin != s) {
+    Message::MessageToSocket(socket, m);
+  } else if (m->type == SERVER_REGISTER && m->origin != s) {
+    Message::MessageToSocket(socket, m);
   }
 }
 
