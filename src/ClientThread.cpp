@@ -57,7 +57,7 @@ void Thread::runClient(Client* c) {
       for (int i = 0; i < server4->clients.size(); i++)
         if (server4->clients[i] == c)
           server4->clients.erase(server4->clients.begin() + i);
-      pthread_mutex_unlock(&(server4->m_clients));
+pthread_mutex_unlock(&(server4->m_clients));
 
 
       stop(true);
@@ -141,7 +141,6 @@ void Thread::processClientMessage(Client* c, Message* msg) {
 }
 
 void Thread::processClientBroadcast(Client* c, Message* msg) {
-  msg->parseData();
   msg->buildRawData();
   if (msg->type == CLIENT_ADDED || msg->type == NAMECHANGE_FROM_SERVER || CLIENT_REMOVED_FROM_SERVER)
     Message::MessageToSocket(socket, msg);
