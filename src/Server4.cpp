@@ -31,7 +31,8 @@ using namespace std;
 Socket controlServer_socket;
 
 Server4::Server4() {
-
+        
+        parentServer = NULL;
 
 	// Read configuration file
 	if (config.parseFile() == configFile::SUCCESS) {
@@ -211,6 +212,7 @@ void* Server4::controlThread(void *_obj) {
 
 			if (response->words[1] != "none" && 
 			    response->words[1] != "" && 
+			    server4->parentServer != NULL &&
 			    server4->parentServer->getTag().compare(response->words[0]) == 0) {
 			  server4->logStream << "Got parent server address: " << response->words[1] << std::endl << std::endl;
 
