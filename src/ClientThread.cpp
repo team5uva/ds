@@ -31,7 +31,7 @@ void Thread::runClient(Client* c) {
     if (server4->clients[i] == c)
       continue;
     clientNameMsg.type = CLIENT_ADDED;
-    clientNameMsg.addParameter(server4->clients[i]->name);
+    clientNameMsg.addParameter(server4->clients[i]->changedName);
     clientNameMsg.buildRawData();
     Message::MessageToSocket(socket, &clientNameMsg);
   }
@@ -142,9 +142,9 @@ void Thread::processClientMessage(Client* c, Message* msg) {
 
 void Thread::processClientBroadcast(Client* c, Message* msg) {
   msg->buildRawData();
-  if (msg->type == CLIENT_ADDED || msg->type == NAMECHANGE_FROM_SERVER || msg->type == CLIENT_REMOVED_FROM_SERVER)
+  if (msg->type == CLIENT_ADDED || msg->type == NAMECHANGE_FROM_SERVER || msg->type == CLIENT_REMOVED_FROM_SERVER) {
     Message::MessageToSocket(socket, msg);
-  else if ((msg->type == TEXT_FROM_SERVER || msg->type == ACTION_FROM_SERVER) &&
+  } else if ((msg->type == TEXT_FROM_SERVER || msg->type == ACTION_FROM_SERVER) &&
       (msg->words[1].compare(c->changedName) == 0 ||
       msg->words[0].compare(c->changedName) == 0 ||
       msg->words[1].compare("#all") == 0))

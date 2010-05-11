@@ -151,6 +151,11 @@ void Thread::processServerMessage(Server* s, Message* m) {
   } else if (m->type == NAMECHANGE_FROM_SERVER) {
     response->type = NAMECHANGE_FROM_SERVER;
     response->words = m->words;
+    pthread_mutex_lock(&(server4->m_clients));
+    for (int i = 0; i < server4->clients.size(); i++)
+      if (server4->clients[i]->changedName == m->words[0])
+        server4->clients[i]->changedName = m->words[1];
+    pthread_mutex_unlock(&(server4->m_clients));
     response->origin = s;
     server4->addBroadcast(response);
   } else if (m->type == SERVER_REGISTER) {
