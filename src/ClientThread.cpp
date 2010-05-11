@@ -48,7 +48,7 @@ void Thread::runClient(Client* c) {
 
       Message* response = new Message();
       response->type = CLIENT_REMOVED_FROM_SERVER;
-      response->addParameter(c->name);
+      response->addParameter(c->changedName);
       response->addParameter("client timed out");
       response->buildRawData();
       server4->addBroadcast(response);
@@ -67,7 +67,7 @@ pthread_mutex_unlock(&(server4->m_clients));
       receivedMessage = Message::messageFromSocket(socket, false);
 
       if (receivedMessage != NULL) {
-        server4->logStream << "from client: " << c->name << endl;
+        server4->logStream << "from client: " << c->changedName << endl;
         receivedMessage->parseData();
         server4->logStream << "received message with type: " << receivedMessage->getType() << endl;
 
@@ -96,7 +96,7 @@ void Thread::processClientMessage(Client* c, Message* msg) {
   Message response;
 
   if (msg->type == CLIENT_REMOVED_FROM_CLIENT) {
-    msg->words.insert(msg->words.begin(), c->name);
+    msg->words.insert(msg->words.begin(), c->changedName);
     server4->addBroadcast(CLIENT_REMOVED_FROM_SERVER, &(msg->words));
 
     pthread_mutex_lock(&(server4->m_clients));
