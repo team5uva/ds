@@ -21,7 +21,7 @@ void Thread::runServer(Server* s) {
   for (int i = 0; i < server4->clients.size(); i++) {
     Message clientNameMsg;
     clientNameMsg.type = CLIENT_ADDED;
-    clientNameMsg.addParameter(server4->clients[i]->name);
+    clientNameMsg.addParameter(server4->clients[i]->changedName);
     clientNameMsg.buildRawData();
     Message::MessageToSocket(socket, &clientNameMsg);
   }
