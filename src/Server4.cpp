@@ -68,7 +68,7 @@ Server4::Server4() {
 		  logfile.append(".");
 		}
 		logfile.append("log");
-		logStream.open(logfile.c_str(), std::fstream::in | std::fstream::out | std::fstream::app);
+		logStream.open(logfile.c_str(), ios::out | ios::app);
 		address.append(":");
 		address.append(identificationTag);
 
