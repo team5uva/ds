@@ -209,12 +209,14 @@ void* Server4::controlThread(void *_obj) {
 
 			server4->deleteServer(response->words[0]);
 
-			if (response->words[1] != "none" || response->words[1] == "") {
-				server4->logStream << "Got parent server address: " << response->words[1] << std::endl << std::endl;
+			if (response->words[1] != "none" && 
+			    response->words[1] != "" && 
+			    server4->parentServer->getTag().compare(response->words[0]) == 0) {
+			  server4->logStream << "Got parent server address: " << response->words[1] << std::endl << std::endl;
 
-				//Create parent server
-				Server* server = new Server(response->words[1]);
-				server4->addServer(server, true);
+			  //Create parent server
+			  Server* server = new Server(response->words[1]);
+			  server4->addServer(server, true);
 			}
 
 		} else {
