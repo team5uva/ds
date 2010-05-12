@@ -100,5 +100,6 @@ void ServerServerTest :: transmissionTest (void)
 
     CPPUNIT_ASSERT_EQUAL ((int)a->clients.size(), (int)b->clients.size());
     CPPUNIT_ASSERT_EQUAL (matches, (int)a->clients.size());
+    CPPUNIT_ASSERT_EQUAL(4, (int)a->clients.size());
 }
 

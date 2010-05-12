@@ -20,7 +20,9 @@ Message* Message::messageFromSocket(Socket* s, bool blocking)
     return NULL;
 
   length = htons(length);
-  s->readBytes(message, 0, length);
+  int readBytes = s->readBytes(message, 0, length);
+  if (readBytes != length)
+    return NULL;
 
   return new Message(message, length);
 }
