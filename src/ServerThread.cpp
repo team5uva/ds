@@ -21,7 +21,7 @@ void Thread::runServer(Server* s) {
   for (int i = 0; i < server4->clients.size(); i++) {
     Message clientNameMsg;
     clientNameMsg.type = CLIENT_ADDED;
-    clientNameMsg.addParameter(server4->clients[i]->changedName);
+    clientNameMsg.addParameter(server4->clients[i]->name);
     clientNameMsg.buildRawData();
     Message::MessageToSocket(socket, &clientNameMsg);
   }
@@ -40,7 +40,7 @@ void Thread::runServer(Server* s) {
         if (server4->clients[i]->parentServer == s) {
           Message* response = new Message();
           response->type = CLIENT_REMOVED_FROM_SERVER;
-          response->addParameter(server4->clients[i]->changedName);
+          response->addParameter(server4->clients[i]->name);
           response->origin = s;
           server4->addBroadcast(response);
           server4->clients.erase(server4->clients.begin() + i);
@@ -48,8 +48,7 @@ void Thread::runServer(Server* s) {
         //Message::MessageToSocket(socket, &clientNameMsg);
       }
       pthread_mutex_unlock(&(server4->m_clients));
-
-
+      //s->messageToControl(PEER_LOST, s->targetServerName);
       stop(false);
     } else {
       //ProcessServerMessage
@@ -67,8 +66,8 @@ void Thread::runServer(Server* s) {
         //ProcessServer Broadcas
       else if (latestBroadcast == NULL) {
         latestBroadcast = server4->getLatestBroadcast();
-        if (latestBroadcast != NULL)
-          processServerBroadcast(s, latestBroadcast);
+        //if (latestBroadcast != NULL)
+        //  processServerBroadcast(s, latestBroadcast);
       } else if (latestBroadcast->next != NULL) {
         latestBroadcast = latestBroadcast->next;
         processServerBroadcast(s, latestBroadcast);
@@ -107,7 +106,7 @@ void Thread::processServerMessage(Server* s, Message* m) {
     waiting_for_pong = false;
   } else if (m->type == CLIENT_ADDED) {
     Client* c = new Client();
-    c->name = c->changedName = m->words[0];
+    c->name = c->name = m->words[0];
     c->isAdmin = false;
     c->parentServer = s;
     response->type = CLIENT_ADDED;
@@ -116,7 +115,7 @@ void Thread::processServerMessage(Server* s, Message* m) {
 
     pthread_mutex_lock(&(server4->m_clients));
     for (int i = 0; i < server4->clients.size(); i++)
-      if (server4->clients[i]->changedName == c->name)
+      if (server4->clients[i]->name == c->name)
       {
 	pthread_mutex_unlock(&(server4->m_clients));
         return;
@@ -129,7 +128,7 @@ void Thread::processServerMessage(Server* s, Message* m) {
 
     pthread_mutex_lock(&(server4->m_clients));
     for (int i = 0; i < server4->clients.size(); i++)
-      if (server4->clients[i]->changedName == m->words[0])
+      if (server4->clients[i]->name == m->words[0])
         server4->clients.erase(server4->clients.begin() + i);
     pthread_mutex_unlock(&(server4->m_clients));
     response->type = CLIENT_REMOVED_FROM_SERVER;
@@ -142,6 +141,14 @@ void Thread::processServerMessage(Server* s, Message* m) {
     response->type = TEXT_FROM_SERVER;
     response->words = m->words;
     response->origin = s;
+    //pthread_mutex_lock(&(server4->m_clients));
+    //for (int i = 0; i < server4->clients.size(); i++) {
+    //  if (server4->clients[i]->name.compare(m->words[1]) == 0) {
+    //    m->dest = server4->clients[i]->parentServer;
+    //    break;
+    //  }
+    //}/
+    //pthread_mutex_unlock(&(server4->m_clients));
     server4->addBroadcast(response);
   } else if (m->type == ACTION_FROM_SERVER) {
     response->type = ACTION_FROM_SERVER;
@@ -153,14 +160,9 @@ void Thread::processServerMessage(Server* s, Message* m) {
     response->words = m->words;
     pthread_mutex_lock(&(server4->m_clients));
     for (int i = 0; i < server4->clients.size(); i++)
-      if (server4->clients[i]->changedName == m->words[0])
-        server4->clients[i]->changedName = m->words[1];
+      if (server4->clients[i]->name == m->words[0])
+        server4->clients[i]->name = m->words[1];
     pthread_mutex_unlock(&(server4->m_clients));
-    response->origin = s;
-    server4->addBroadcast(response);
-  } else if (m->type == SERVER_REGISTER) {
-    response->type = SERVER_REGISTER;
-    response->words = m->words;
     response->origin = s;
     server4->addBroadcast(response);
   }
@@ -172,13 +174,11 @@ void Thread::processServerBroadcast(Server* s, Message* m) {
     Message::MessageToSocket(socket, m);
   } else if (m->type == CLIENT_ADDED && m->origin != s) {
     Message::MessageToSocket(socket, m);
-  } else if (m->type == TEXT_FROM_SERVER && m->origin != s) {
+  } else if (m->type == TEXT_FROM_SERVER && m->origin != s) { //&& (m->words[1].compare("#all") == 0 || m->dest == s)) {
     Message::MessageToSocket(socket, m);
   } else if (m->type == ACTION_FROM_SERVER && m->origin != s) {
     Message::MessageToSocket(socket, m);
   } else if (m->type == NAMECHANGE_FROM_SERVER && m->origin != s) {
-    Message::MessageToSocket(socket, m);
-  } else if (m->type == SERVER_REGISTER && m->origin != s) {
     Message::MessageToSocket(socket, m);
   }
 }

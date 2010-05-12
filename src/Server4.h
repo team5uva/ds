@@ -33,7 +33,7 @@ public:
 	vector<Client*> clients;
 	vector<Server*> servers;
 	vector<Message*> broadcastList;
-	pthread_mutex_t m_broadcast, m_clients;
+	pthread_mutex_t m_broadcast, m_clients, m_servers;
 	Socket* listenSocket;
 
 	std::fstream logStream;

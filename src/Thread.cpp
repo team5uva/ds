@@ -48,8 +48,7 @@ void Thread::start(Socket* socket, Server4* server4) {
 void Thread::stop(bool isClient) {
   assert(m_running == true);
   m_stoprequested = true;
-  while (m_running && !isClient)
-    ;
+  while (m_running && !isClient);
   delete socket;
   socket = 0;
   server4->logStream << "Stopping " << (isClient ? "client" : "server") << " thread." << endl;
@@ -95,7 +94,7 @@ void Thread::determineType() {
     Client* c = new Client();
 
     do {
-      c->name = c->changedName = firstMessage->words[0];
+      c->name = firstMessage->words[0];
 
       /* If password was included */
       if (firstMessage->words.size() > 1) {
@@ -124,7 +123,7 @@ void Thread::determineType() {
         registered = true;
 
 	for (int i = 0; i < server4->clients.size(); i++)
-	  if (server4->clients[i]->changedName.compare(c->name) == 0)
+	  if (server4->clients[i]->name.compare(c->name) == 0)
 	    registered = false;
 
 	if (!registered)
@@ -164,7 +163,7 @@ void Thread::determineType() {
     server4->logStream << "new Child Server: " << firstMessage->words[0] << "    -  " << firstMessage->words.size() << std::endl;
     this->server4->addServer(s, false);
 
-    //server4->addBroadcast(CLIENT_ADDED, &(firstMessage->words));
+    latestBroadcast = server4->addBroadcast(0, &(firstMessage->words));
     runServer(s);
 
   } else {

@@ -12,9 +12,9 @@ int main(int argc, char* argv[]) {
 	pthread_t controlServer_thread;
 
 
-	server4.listenSocket = new Socket;
-	server4.port = server4.listenSocket->bindTo(server4.port);
-	server4.listenSocket->listenForConn();
+	//server4.listenSocket = new Socket;
+	//server4.port = server4.listenSocket->bindTo(server4.port);
+	//server4.listenSocket->listenForConn();
 	int error = pthread_create(&controlServer_thread, 0, Server4::controlThread, &server4);
 
 	while (true) {

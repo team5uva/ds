@@ -16,7 +16,7 @@ Socket::Socket() {
 	if (sockfd < 0) // did not get valid socket
 	{
 		//std::cout << "failed to acquire socket" << std::endl;
-		exit(0);
+		//exit(0);
 	}
 	sockState = NEW;
 }
@@ -167,3 +167,4 @@ int Socket::getPort()
 {
 	return port;
 }
+

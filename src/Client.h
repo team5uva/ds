@@ -14,7 +14,6 @@ public:
 
 	string socketaddress;
 	string name;
-  	string changedName;
 	string password;
 	Server* parentServer;
   bool isAdmin;

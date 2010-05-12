@@ -15,9 +15,9 @@ public:
   int length;
   vector<string> words;
   unsigned char* rawData;
-  bool isMulticast;
   Message* next;
   Server* origin;
+  Server* dest;
 
   static void MessageToSocket(Socket* s, Message* m);
   static Message* messageFromSocket(Socket* s, bool blocking);

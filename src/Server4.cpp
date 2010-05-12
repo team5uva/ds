@@ -32,17 +32,22 @@ Socket controlServer_socket;
 
 Server4::Server4() {
         
-        parentServer = NULL;
+  parentServer = NULL;
 
 	// Read configuration file
 	if (config.parseFile() == configFile::SUCCESS) {
 		pthread_mutex_init(&m_broadcast, 0);
 		pthread_mutex_init(&m_clients, 0);
+    pthread_mutex_init(&m_servers, 0);
 
 		this->administrators = config.adminAccess;
 
-
 		port = config.getListenPort();
+    
+    listenSocket = new Socket;
+    port = listenSocket->bindTo(port);
+    listenSocket->listenForConn();
+
 		identificationTag = config.getTag();
 		std::ostringstream oss;
 		srandom(time(0));
@@ -137,6 +142,7 @@ Message* Server4::getLatestBroadcast() {
 void Server4::addServer(Server* server, bool parent) {
 	logStream << "Adding server  ..." << "\n";
 
+        pthread_mutex_lock(&m_servers);
 	servers.push_back(server);
 
 	if (parent) {
@@ -148,10 +154,11 @@ void Server4::addServer(Server* server, bool parent) {
 		t->start(server, this);
 
 	}
+        pthread_mutex_unlock(&m_servers);
 }
 
 void Server4::deleteServer(string serverTag) {
-
+  pthread_mutex_lock(&m_servers);
 	for (unsigned int i = 0; i < servers.size(); i++) {
 		if (servers[i]->getTag() == serverTag) {
 
@@ -161,6 +168,7 @@ void Server4::deleteServer(string serverTag) {
 			servers.erase(servers.begin() + i);
 		}
 	}
+  pthread_mutex_unlock(&m_servers);
 }
 
 void* Server4::controlThread(void *_obj) {
@@ -208,9 +216,7 @@ void* Server4::controlThread(void *_obj) {
 
 			server4->logStream << "REGROUP: " << response->words[0] << " new parent: " << response->words[1] << std::endl << std::endl;
 
-			server4->deleteServer(response->words[0]);
-
-			if (response->words[1] != "none" && 
+      if (response->words[1] != "none" && 
 			    response->words[1] != "" && 
 			    server4->parentServer != NULL &&
 			    server4->parentServer->getTag().compare(response->words[0]) == 0) {
@@ -220,7 +226,7 @@ void* Server4::controlThread(void *_obj) {
 			  Server* server = new Server(response->words[1]);
 			  server4->addServer(server, true);
 			}
-
+      server4->deleteServer(response->words[0]);
 		} else {
 			//BREAKING CONNECTION
 			server4->logStream << "Lost connection with Control. Reconnecting... " << std::endl << std::endl;
@@ -234,7 +240,7 @@ void Server4::connectToControl(Server4* server4) {
 	Message m;
 	m.type = ADDRESS_TO_CONTROL;
 	m.addParameter(server4->address);
-
+  cout << server4->address << endl;
 	m.buildRawData();
 
 	logStream << "To Control Server Message: " << m.words[0] << std::endl;
