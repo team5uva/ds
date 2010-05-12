@@ -240,7 +240,6 @@ void Server4::connectToControl(Server4* server4) {
 	Message m;
 	m.type = ADDRESS_TO_CONTROL;
 	m.addParameter(server4->address);
-  cout << server4->address << endl;
 	m.buildRawData();
 
 	logStream << "To Control Server Message: " << m.words[0] << std::endl;
