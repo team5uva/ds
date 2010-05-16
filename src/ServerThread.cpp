@@ -5,9 +5,9 @@
 #include "Thread.h"
 #include "Server.h"
 
+/* Runs the server thread. */
 void Thread::runServer(Server* s) {
   Message* receivedMessage;
-  Message response;
   bool sleep;
 
   lastActivityTime = time(0);
@@ -16,7 +16,7 @@ void Thread::runServer(Server* s) {
 
   server4->logStream << "Started server thread." << endl;
 
-  //Connected clients given to new server
+  /* Send list of connected clients to server. */
   pthread_mutex_lock(&(server4->m_clients));
   for (int i = 0; i < server4->clients.size(); i++) {
     Message clientNameMsg;
@@ -27,12 +27,14 @@ void Thread::runServer(Server* s) {
   }
   pthread_mutex_unlock(&(server4->m_clients));
 
-  //Connected servers to new server
   while (!m_stoprequested) {
     sleep = true;
 
     if (lastActivityTime + 10 < time(0) && !waiting_for_pong)
       ping();
+    /* If no pong is received after ping within two seconds, remove all clients
+     * connected to this server from the global list of clients.
+     */
     else if (lastActivityTime + 2 < time(0) && waiting_for_pong) {
       server4->logStream << "ending connection, no pong in correct time" << std::endl;
       pthread_mutex_lock(&(server4->m_clients));
@@ -45,13 +47,11 @@ void Thread::runServer(Server* s) {
           server4->addBroadcast(response);
           server4->clients.erase(server4->clients.begin() + i);
         }
-        //Message::MessageToSocket(socket, &clientNameMsg);
       }
       pthread_mutex_unlock(&(server4->m_clients));
-      //s->messageToControl(PEER_LOST, s->targetServerName);
       stop(false);
+    /* Else keep sending and receiving messages. */
     } else {
-      //ProcessServerMessage
       receivedMessage = Message::messageFromSocket(socket, false);
 
       if (receivedMessage != NULL) {
@@ -63,11 +63,8 @@ void Thread::runServer(Server* s) {
 
         sleep = false;
       }
-        //ProcessServer Broadcas
       else if (latestBroadcast == NULL) {
         latestBroadcast = server4->getLatestBroadcast();
-        //if (latestBroadcast != NULL)
-        //  processServerBroadcast(s, latestBroadcast);
       } else if (latestBroadcast->next != NULL) {
         latestBroadcast = latestBroadcast->next;
         processServerBroadcast(s, latestBroadcast);
@@ -84,6 +81,7 @@ void Thread::runServer(Server* s) {
   m_running = false;
 }
 
+/* Processs a message from server. */
 void Thread::processServerMessage(Server* s, Message* m) {
   /* Message types to handle:
      300 - TEXT_FROM_SERVER
@@ -115,9 +113,8 @@ void Thread::processServerMessage(Server* s, Message* m) {
 
     pthread_mutex_lock(&(server4->m_clients));
     for (int i = 0; i < server4->clients.size(); i++)
-      if (server4->clients[i]->name == c->name)
-      {
-	pthread_mutex_unlock(&(server4->m_clients));
+      if (server4->clients[i]->name == c->name) {
+        pthread_mutex_unlock(&(server4->m_clients));
         return;
       }
     pthread_mutex_unlock(&(server4->m_clients));
@@ -141,14 +138,6 @@ void Thread::processServerMessage(Server* s, Message* m) {
     response->type = TEXT_FROM_SERVER;
     response->words = m->words;
     response->origin = s;
-    //pthread_mutex_lock(&(server4->m_clients));
-    //for (int i = 0; i < server4->clients.size(); i++) {
-    //  if (server4->clients[i]->name.compare(m->words[1]) == 0) {
-    //    m->dest = server4->clients[i]->parentServer;
-    //    break;
-    //  }
-    //}/
-    //pthread_mutex_unlock(&(server4->m_clients));
     server4->addBroadcast(response);
   } else if (m->type == ACTION_FROM_SERVER) {
     response->type = ACTION_FROM_SERVER;
@@ -168,13 +157,14 @@ void Thread::processServerMessage(Server* s, Message* m) {
   }
 }
 
+/* Processes a unicast/multicast from the global broadcast list. */
 void Thread::processServerBroadcast(Server* s, Message* m) {
   m->buildRawData();
   if (m->type == CLIENT_REMOVED_FROM_SERVER && m->origin != s) {
     Message::MessageToSocket(socket, m);
   } else if (m->type == CLIENT_ADDED && m->origin != s) {
     Message::MessageToSocket(socket, m);
-  } else if (m->type == TEXT_FROM_SERVER && m->origin != s) { //&& (m->words[1].compare("#all") == 0 || m->dest == s)) {
+  } else if (m->type == TEXT_FROM_SERVER && m->origin != s) {
     Message::MessageToSocket(socket, m);
   } else if (m->type == ACTION_FROM_SERVER && m->origin != s) {
     Message::MessageToSocket(socket, m);

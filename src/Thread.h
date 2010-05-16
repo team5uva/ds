@@ -6,14 +6,13 @@
 
 using namespace std;
 
-class Thread
-{
+class Thread {
 private:
-  enum STATUS 
-  {
-	  SERVER,
-	  CLIENT
-	} type;
+
+  enum STATUS {
+    SERVER,
+    CLIENT
+  } type;
 
   pthread_mutex_t m_mutex;
   pthread_t m_thread;
@@ -39,10 +38,10 @@ public:
   int getType();
   volatile bool m_stoprequested;
   volatile bool m_running;
-  
-	Thread();
 
-	~Thread();
+  Thread();
+
+  ~Thread();
 
   /* Start the thread. */
   void start(Socket* socket, Server4* server);

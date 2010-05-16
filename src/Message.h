@@ -8,8 +8,7 @@ class Server;
 
 using namespace std;
 
-class Message
-{
+class Message {
 public:
   int type;
   int length;
@@ -27,7 +26,9 @@ public:
   void buildRawData();
   int getType();
   void addParameter(string s);
-  ~Message(){}
+
+  ~Message() {
+  }
 };
 
 #endif /* MESSAGE_H_ */

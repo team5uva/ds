@@ -3,20 +3,16 @@
 #define SOCKET_H_
 #include <string>
 #include "Message.h"
-#include "SocketException.h"
 
 using namespace std;
 
-class Socket
-{
-
+class Socket {
 private:
   int sockState;
   int sockfd;
   int port;
 
-  enum STATUS
-  {
+  enum STATUS {
     NEW = 0,
     BOUND = 1,
     CONNECTED = 2,
@@ -28,10 +24,10 @@ public:
   Socket(int sockfd);
 
   ~Socket();
-  
+
   /* Binds socket to port */
   int bindTo(int port);
-   /* Connects to port on different machine */
+  /* Connects to port on different machine */
   int connectTo(string host, int port);
   /* Blocks thread till external connection attempt is made */
   Socket* acceptConn();
@@ -41,11 +37,11 @@ public:
   int peekBytes(unsigned char* inBuffer, int prevReadLen, int bytes, bool blocking);
   //int peekBytesNB(unsigned char* inBuffer, int prevReadLen, int bytes);
   int writeBytes(unsigned char* buffer, int bytes);
- 
+
 
   /* Gets socket file descriptor */
   int getSockfd();
-  
+
   /* Gets socket state. Return values:
    * 1 = New
    * 2 = Bound

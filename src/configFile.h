@@ -11,31 +11,32 @@ private:
 
 
 public:
-    enum ERROR_CODE {
-        SUCCESS, FAIL, CORRUPT_CONFIG_FILE, COULD_NOT_OPEN_FILE, FILE_NOT_FOUND
-    };
-    string path;
-    int listenPort, CSPort;
-    bool perIpLog;
-    string CSAddress, Tag;
-    vector<Admin*> adminAccess;
 
-    configFile() {
-        path = "config.cfg";
-	perIpLog = false;
-    }
+  enum ERROR_CODE {
+    SUCCESS, FAIL, CORRUPT_CONFIG_FILE, COULD_NOT_OPEN_FILE, FILE_NOT_FOUND
+  };
+  string path;
+  int listenPort, CSPort;
+  bool perIpLog;
+  string CSAddress, Tag;
+  vector<Admin*> adminAccess;
 
-    configFile(string path) {
-        this->path = path;
-    }
+  configFile() {
+    path = "config.cfg";
+    perIpLog = false;
+  }
 
-    int convertS2I(string s);
-    ERROR_CODE parseFile();
-    int getListenPort();
-    int getCSPort();
-    string getCSAddress();
-    string getTag();
-    bool getPerIpLog();
-    vector<Admin*> getAdmin();
+  configFile(string path) {
+    this->path = path;
+  }
+
+  int convertS2I(string s);
+  ERROR_CODE parseFile();
+  int getListenPort();
+  int getCSPort();
+  string getCSAddress();
+  string getTag();
+  bool getPerIpLog();
+  vector<Admin*> getAdmin();
 };
 #endif /* PARSECONFIG_H_ */

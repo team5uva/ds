@@ -17,44 +17,45 @@ class Server;
 class Server4 {
 public:
 
-	// loaded from configuration file
-        configFile config;
+  // loaded from configuration file
+  configFile config;
 
-	int port;
-	string controlServerAddress;
-	string identificationTag;
-	string address;
-	vector<Admin*> administrators;
+  int port;
+  string controlServerAddress;
+  string identificationTag;
+  string address;
+  vector<Admin*> administrators;
 
-	bool connected;
-	Server* parentServer;
-	pthread_t mainthread;
+  bool connected;
+  Server* parentServer;
+  pthread_t mainthread;
 
-	vector<Client*> clients;
-	vector<Server*> servers;
-	vector<Message*> broadcastList;
-	pthread_mutex_t m_broadcast, m_clients, m_servers;
-	Socket* listenSocket;
+  vector<Client*> clients;
+  vector<Server*> servers;
+  vector<Message*> broadcastList;
+  pthread_mutex_t m_broadcast, m_clients, m_servers;
+  Socket* listenSocket;
 
-	std::fstream logStream;
+  std::fstream logStream;
 
-	enum STATUS {
-		ADMIN = 0, REGULAR = 1
-	};
+  enum STATUS {
+    ADMIN = 0, REGULAR = 1
+  };
 
-	void addServer(Server* server, bool parent);
-	void addClient(Client* client);
-	Message* addBroadcast(Message* msg);
-	Message* addBroadcast(int type, vector<string>* words);
-	Message* getLatestBroadcast();
-	void deleteServer(string serverTag);
-	void connectToControl(Server4* server4);
+  void addServer(Server* server, bool parent);
+  void addClient(Client* client);
+  Message* addBroadcast(Message* msg);
+  Message* addBroadcast(int type, vector<string>* words);
+  Message* getLatestBroadcast();
+  void deleteServer(string serverTag);
+  void connectToControl(Server4* server4);
 
-	static void* controlThread(void *_obj);
+  static void* controlThread(void *_obj);
 
-	Server4();
-	~Server4() {
-	}
+  Server4();
+
+  ~Server4() {
+  }
 };
 
 #endif /* SERVER4_H_ */

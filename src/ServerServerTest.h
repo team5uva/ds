@@ -7,22 +7,20 @@
 
 using namespace std;
 
-class ServerServerTest : public CPPUNIT_NS :: TestFixture
-{
-
-    CPPUNIT_TEST_SUITE (ServerServerTest);
-    CPPUNIT_TEST (transmissionTest);
-    CPPUNIT_TEST_SUITE_END ();
+class ServerServerTest : public CPPUNIT_NS::TestFixture {
+  CPPUNIT_TEST_SUITE(ServerServerTest);
+  CPPUNIT_TEST(transmissionTest);
+  CPPUNIT_TEST_SUITE_END();
 
 
-    public:
-        void setUp (void);
-        void tearDown (void);
+public:
+  void setUp(void);
+  void tearDown(void);
 
-    protected:
-        void transmissionTest (void);
-    private:
-        Server4 *a, *b;
+protected:
+  void transmissionTest(void);
+private:
+  Server4 *a, *b;
 };
 
 #endif

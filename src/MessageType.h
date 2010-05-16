@@ -1,5 +1,4 @@
-enum MessageType
-{
+enum MessageType {
   CLIENT_REGISTER = 100,
   CLIENT_ADDED = 110,
   CLIENT_REMOVED_FROM_CLIENT = 120,

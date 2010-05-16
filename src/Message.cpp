@@ -5,18 +5,20 @@
 #include "Socket.h"
 #include "MessageType.h"
 
-Message* Message::messageFromSocket(Socket* s, bool blocking)
-{
+/* Gets a message from a given socket, the blocking variable decides
+ * whether the operation is blocking or not.
+ */
+Message* Message::messageFromSocket(Socket* s, bool blocking) {
   unsigned char* message = new unsigned char[200];
   int bytesPeeked;
   short length;
 
-  bytesPeeked = s->peekBytes((unsigned char*)&length, 0, 2, blocking);
+  bytesPeeked = s->peekBytes((unsigned char*) & length, 0, 2, blocking);
 
-  if(!blocking && bytesPeeked < 0)
+  if (!blocking && bytesPeeked < 0)
     return NULL;
 
-  if(bytesPeeked == 0)
+  if (bytesPeeked == 0)
     return NULL;
 
   length = htons(length);
@@ -27,77 +29,69 @@ Message* Message::messageFromSocket(Socket* s, bool blocking)
   return new Message(message, length);
 }
 
-void Message::MessageToSocket(Socket* s, Message* m)
-{
-  //std::cout << "trying to send message of length " << m->length << " and code " << m->type << std::endl;
+/* Sends a message to a socket. */
+void Message::MessageToSocket(Socket* s, Message* m) {
   s->writeBytes(m->rawData, m->length);
 }
 
-Message::Message(unsigned char* data, int length)
-{
+/* Message constructor. */
+Message::Message(unsigned char* data, int length) {
   this->rawData = data;
   this->length = length;
   origin = NULL;
   next = NULL;
 }
 
-Message::Message()
-{
+/* Message constructor. */
+Message::Message() {
   this->rawData = new unsigned char[200];
   this->length = 0;
   origin = NULL;
   next = NULL;
 }
 
-int Message::getType()
-{
+/* Gets the mssage type. */
+int Message::getType() {
   return type;
 }
 
-void Message::addParameter(string s)
-{
+/* Adds a word to the message. */
+void Message::addParameter(string s) {
   words.push_back(s);
 }
 
-void Message::parseData()
-{
-  //assert((rawData[0] << 8) + rawData[1]) == length);
-
+/* Parses the message data. */
+void Message::parseData() {
   this->type = (rawData[2] << 8) + rawData[3];
 
   words.push_back(string());
 
-  for (int i = 4; i < length; i++)
-  {
-    if(rawData[i] == ' ' || rawData[i] == '\t')
-    {
-      if(words.back().length() > 0)
-	      words.push_back(string());
-    }
-    else
+  for (int i = 4; i < length; i++) {
+    if (rawData[i] == ' ' || rawData[i] == '\t') {
+      if (words.back().length() > 0)
+        words.push_back(string());
+    } else
       words.back().push_back(rawData[i]);
   }
 }
 
-void Message::buildRawData()
-{
+/* Prepares message for transmission. */
+void Message::buildRawData() {
   short rawType = htons(type);
-  rawData[2] = ((unsigned char*)&rawType)[0];
-  rawData[3] = ((unsigned char*)&rawType)[1];
+  rawData[2] = ((unsigned char*) & rawType)[0];
+  rawData[3] = ((unsigned char*) & rawType)[1];
 
 
   string message;
 
-  for (int i = 0; i < words.size(); i++)
-  {
+  for (int i = 0; i < words.size(); i++) {
     message.append(words[i]);
     if (i + 1 < words.size())
       message.append(" ");
   }
 
-  for (int i = 0; i < message.size(); i++)
-  {
-    rawData[i+4] = message[i];
+  for (int i = 0; i < message.size(); i++) {
+    rawData[i + 4] = message[i];
   }
 
   length = 4 + message.size();
@@ -105,6 +99,6 @@ void Message::buildRawData()
   rawData[0] = rawSize;
 
 
-  rawData[0] = ((unsigned char*)&rawSize)[0];
-  rawData[1] = ((unsigned char*)&rawSize)[1];
+  rawData[0] = ((unsigned char*) & rawSize)[0];
+  rawData[1] = ((unsigned char*) & rawSize)[1];
 }

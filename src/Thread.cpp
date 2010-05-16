@@ -8,25 +8,19 @@
 
 using namespace std;
 
+/* Thread constructor. */
 Thread::Thread() :
 m_stoprequested(false), m_running(false) {
   pthread_mutex_init(&m_mutex, 0);
 }
 
+/* Thread destructor. */
 Thread::~Thread() {
   pthread_mutex_destroy(&m_mutex);
 }
 
-void* Thread::start_thread(void *obj) {
-  Thread* t = reinterpret_cast<Thread*>(obj);
-  if (t->parentServer == NULL)
-    t->determineType();
-  else
-    t->startParentConnection();
-}
-
-void Thread::start(Server* server, Server4* server4)
-{
+/* Starts the thread */
+void Thread::start(Server* server, Server4* server4) {
   assert(m_running == false);
   m_running = true;
   this->server4 = server4;
@@ -34,7 +28,8 @@ void Thread::start(Server* server, Server4* server4)
   this->socket = NULL;
   pthread_create(&m_thread, 0, &Thread::start_thread, this);
 }
-/* Start the thread. */
+
+/* Starts the thread. */
 void Thread::start(Socket* socket, Server4* server4) {
   assert(m_running == false);
   m_running = true;
@@ -44,7 +39,15 @@ void Thread::start(Socket* socket, Server4* server4) {
   pthread_create(&m_thread, 0, &Thread::start_thread, this);
 }
 
-/* Stop the thread. */
+void* Thread::start_thread(void *obj) {
+  Thread* t = reinterpret_cast<Thread*> (obj);
+  if (t->parentServer == NULL)
+    t->determineType();
+  else
+    t->startParentConnection();
+}
+
+/* Stops the thread. */
 void Thread::stop(bool isClient) {
   assert(m_running == true);
   m_stoprequested = true;
@@ -54,8 +57,9 @@ void Thread::stop(bool isClient) {
   server4->logStream << "Stopping " << (isClient ? "client" : "server") << " thread." << endl;
   pthread_join(m_thread, 0);
 }
-void Thread::startParentConnection()
-{
+
+/* Starts a connection with the parent server */
+void Thread::startParentConnection() {
   Server* server = parentServer;
   server4->logStream << "Connecting to parent: " << server->getIpAddress() << ":" << server->getPort() << "\n\n";
 
@@ -76,13 +80,14 @@ void Thread::startParentConnection()
     server->messageToControl(PEER_LOST, server->targetServerName);
   }
   return;
-  
+
 
 }
+
+/* Determines whether this is a client or server thread. */
 void Thread::determineType() {
   Message* firstMessage = Message::messageFromSocket(socket, true);
-  if (firstMessage == NULL)
-  {
+  if (firstMessage == NULL) {
     server4->logStream << "incoming connection with invalid first message, quiting" << endl;
     stop(false);
     return;
@@ -100,55 +105,50 @@ void Thread::determineType() {
       if (firstMessage->words.size() > 1) {
         c->password = firstMessage->words[1];
         /* Check password validity here. */
-        for(int i = 0; i < this->server4->administrators.size(); i++) {
-          if(c->name.compare(this->server4->administrators[i]->name) == 0 &&
-              c->password.compare(this->server4->administrators[i]->password) == 0)
-          {
+        for (int i = 0; i < this->server4->administrators.size(); i++) {
+          if (c->name.compare(this->server4->administrators[i]->name) == 0 &&
+              c->password.compare(this->server4->administrators[i]->password) == 0) {
             c->isAdmin = true;
             registered = true;
           }
         }
 
-        if(!registered) {
+        if (!registered) {
           Message response;
           response.type = REGISTRATION_FAIL;
           response.addParameter("Username/password combination unknown.");
           response.buildRawData();
           Message::MessageToSocket(socket, &response);
         }
-      }
-      else
-      {
+      } else {
         c->isAdmin = false;
         registered = true;
 
-	for (int i = 0; i < server4->clients.size(); i++)
-	  if (server4->clients[i]->name.compare(c->name) == 0)
-	    registered = false;
+        for (int i = 0; i < server4->clients.size(); i++)
+          if (server4->clients[i]->name.compare(c->name) == 0)
+            registered = false;
 
-	if (!registered)
-	{
+        if (!registered) {
           Message response;
           response.type = REGISTRATION_FAIL;
           response.addParameter("Username already in use on server.");
           response.buildRawData();
           Message::MessageToSocket(socket, &response);
-	}
+        }
       }
 
-      if(!registered) {
+      if (!registered) {
         delete firstMessage;
         firstMessage = 0;
         firstMessage = Message::messageFromSocket(socket, true);
-	if (firstMessage == NULL)
-	{
-	  server4->logStream << "incoming connection with invalid first message, quiting" << endl;
-	  stop(false);
-	  return;
-	}
+        if (firstMessage == NULL) {
+          server4->logStream << "incoming connection with invalid first message, quiting" << endl;
+          stop(false);
+          return;
+        }
         firstMessage->parseData();
       }
-    } while(!registered);
+    } while (!registered);
 
     this->server4->addClient(c);
 
@@ -171,10 +171,7 @@ void Thread::determineType() {
   }
 }
 
-int Thread::getType() {
-  return type;
-}
-
+/* Sends a ping message to the socket. */
 void Thread::ping() {
   Message ping;
   ping.type = PING;
